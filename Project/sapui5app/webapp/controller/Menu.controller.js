@@ -23,7 +23,7 @@ sap.ui.define([
         };
 
         function navToSignPurchase() {
-            window.open("http://bc735977trial-dev-logali-approuter.cfapps.us10.hana.ondemand.com");
+            //window.open("http://bc735977trial-dev-logali-approuter.cfapps.us10.hana.ondemand.com");
             //open app "http://bc735977trial-dev-logali-approuter.cfapps.us10.hana.ondemand.com"
         };
 

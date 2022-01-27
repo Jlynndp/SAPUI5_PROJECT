@@ -3,13 +3,6 @@
     xmlns="sap.m">
     <Shell id="shell">
         <App id="app">
-            <!-- <pages>
-                <Page id="Page1" showHeader="false">
-                    <content>
-                        <mvc:XMLView id="V_Menu" viewName="logaligroup.sapui5app.view.Menu"></mvc:XMLView>
-                    </content>
-                </Page>
-            </pages>-->
         </App>
     </Shell>
 </mvc:View>
