@@ -1,0 +1,29 @@
+<mvc:View controllerName="logaligroup.sapui5app.controller.Menu" displayBlock="true"
+    xmlns="sap.m"
+    xmlns:mvc="sap.ui.core.mvc">
+
+    <Page id="Page1" showHeader="false">
+        <content>
+            <Bar id="Bar1" design="Header">
+                <contentMiddle >
+                    <Text id="Text1" text="{i18n>menuTitle}" />
+                </contentMiddle>
+            </Bar>
+
+            <Panel id="Pnl_Employee" headerText="{i18n>employee}" expandable="true" expanded="true" class="sapUiResponsiveMargin" width="auto">
+                <GenericTile id="GT_CreateEmployee" press="navToCreateEmployee" headerImage="sap-icon://add-employee" class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout">
+                    <TileContent id="TC_CreateEmployee" footer="{i18n>createEmployee}"/>
+                </GenericTile>
+                <GenericTile id="GT_ShowEmployee" press="navToShowEmployee" headerImage="sap-icon://employee-lookup" class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout">
+                    <TileContent id="TC_ShowEmployee" footer="{i18n>showEmployee}"/>
+                </GenericTile>
+            </Panel>
+
+            <Panel id="Pnl_Purchase" headerText="{i18n>purchase}" expandable="true" expanded="true" class="sapUiResponsiveMargin" width="auto">
+                <GenericTile id="GT_SignPurchase" press="navToSignPurchase" url="http://bc735977trial-dev-logali-approuter.cfapps.us10.hana.ondemand.com" headerImage="sap-icon://signature" class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout">
+                    <TileContent id="TC_SignPurchase" footer="{i18n>signPurchase}"/>
+                </GenericTile>
+            </Panel>
+        </content>
+    </Page>
+</mvc:View>

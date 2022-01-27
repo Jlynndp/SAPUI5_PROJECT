@@ -1,0 +1,39 @@
+{
+  "inputs": [
+    {
+      "id": "UI5Version",
+      "type": "command",
+      "command": "sap.ux.appGenerator.ui5Version"
+    }
+  ],
+  "configurations": [
+    {
+      "name": "sapui5app-run",
+      "cwd": "${workspaceFolder}/Project/sapui5app",
+      "runtimeArgs": [
+        "fiori",
+        "run"
+      ],
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npx",
+      "args": [
+        "--open",
+        "test/flpSandbox.html?sap-client=001#logaligroupsapui5app-display"
+      ],
+      "windows": {
+        "runtimeExecutable": "npx.cmd"
+      },
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart",
+      "env": {
+        "run.config": "{\"handlerId\":\"fiori_tools\",\"runnableId\":\"/home/user/projects/Project/sapui5app\"}",
+        "FIORI_TOOLS_UI5_VERSION": "",
+        "FIORI_TOOLS_UI5_URI": "https://ui5.sap.com",
+        "FIORI_TOOLS_BACKEND_CONFIG": "[{\"path\":\"/sap\",\"destination\":\"logaligroupERP\"}]"
+      }
+    }
+  ],
+  "compounds": [],
+  "version": "0.2.0"
+}

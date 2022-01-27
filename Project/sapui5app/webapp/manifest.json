@@ -1,0 +1,130 @@
+{
+    "_version": "1.32.0",
+    "sap.app": {
+        "id": "logaligroup.sapui5app",
+        "type": "application",
+        "i18n": "i18n/i18n.properties",
+        "applicationVersion": {
+            "version": "0.0.1"
+        },
+        "title": "{{appTitle}}",
+        "description": "{{appDescription}}",
+        "dataSources": {
+            "ZEMPLOYEES_SRV": {
+                "uri": "/sap/opu/odata/sap/ZEMPLOYEES_SRV/",
+                "type": "OData",
+                "settings": {
+                    "annotations": [],
+                    "localUri": "localService/metadata.xml",
+                    "odataVersion": "2.0"
+                }
+            }
+        }
+    },
+    "sap.ui": {
+        "technology": "UI5",
+        "icons": {
+            "icon": "",
+            "favIcon": "",
+            "phone": "",
+            "phone@2": "",
+            "tablet": "",
+            "tablet@2": ""
+        },
+        "deviceTypes": {
+            "desktop": true,
+            "tablet": true,
+            "phone": true
+        }
+    },
+    "sap.ui5": {
+        "flexEnabled": true,
+        "dependencies": {
+            "minUI5Version": "1.97.2",
+            "libs": {
+                "sap.ui.core": {},
+                "sap.m": {},
+                "sap.ui.layout": {}
+            }
+        },
+        "contentDensities": {
+            "compact": true,
+            "cozy": true
+        },
+        "models": {
+            "i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "settings": {
+                    "bundleName": "logaligroup.sapui5app.i18n.i18n"
+                }
+            },
+            "employeeModel": {
+                "type": "sap.ui.model.odata.v2.ODataModel",
+                "dataSource": "ZEMPLOYEES_SRV",
+                "preload": true,
+                "settings": {
+                    "defaultOperationMode": "Server",
+                    "defaultBindingMode": "TwoWay",
+                    "defaultCountMode": "Request",
+                    "refreshAfterChange": false,
+                    "useBatch": false,
+                    "defaultUpdateMethod": "Put"
+                }
+            }
+        },
+        "resources": {
+            "css": [
+                {
+                    "uri": "css/style.css"
+                }
+            ]
+        },
+        "routing": {
+            "config": {
+                "routerClass": "sap.m.routing.Router",
+                "viewType": "XML",
+                "async": true,
+                "viewPath": "logaligroup.sapui5app.view",
+                "controlAggregation": "pages",
+                "controlId": "app",
+                "clearControlAggregation": false
+            },
+            "routes": [
+                {
+                    "name": "RouteMenu",
+                    "pattern": "",
+                    "target": [
+                        "TargetMenu"
+                    ]
+                },
+                {
+                    "name": "RouteCreateEmployee",
+                    "pattern": "CreateEmployee",
+                    "target": [
+                        "TargetCreateEmployee"
+                    ]
+                }
+            ],
+            "targets": {
+                "TargetMenu": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "Menu",
+                    "viewName": "Menu"
+                },
+                "TargetCreateEmployee": {
+                    "viewType": "XML",
+                    "viewId": "CreateEmployee",
+                    "viewName": "CreateEmployee"
+                }
+            }
+        },
+        "rootView": {
+            "viewName": "logaligroup.sapui5app.view.App",
+            "type": "XML",
+            "async": true,
+            "id": "app"
+        }
+    }
+}
