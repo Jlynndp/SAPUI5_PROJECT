@@ -2,97 +2,65 @@
     xmlns="sap.m"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:form="sap.ui.layout.form"
-    xmlns:core="sap.ui.core"
-    xmlns:u="sap.ui.unified">
+    xmlns:core="sap.ui.core">
 
     <NavContainer id="NC_CreateEmployee">
         <pages>
             <!--Create Employee Wizard-->
             <Page id="Pg_CreateEmployee" title="{i18n>createEmployee}" class="sapUiResponsivePadding--header" showHeader="false">
                 <content>
-                    <Wizard id="Wz_CreateEmployee" class="sapUiResponsivePadding--header sapUiResponsivePadding--content" complete="onWizardCompleted">
+                    <Wizard id="CreateEmployeeWizard" class="sapUiResponsivePadding--header sapUiResponsivePadding--content" complete="onWizardCompleted">
 
                         <!--step 1: Employee Type selection-->
-                        <WizardStep id="WS_EmployeeType" title="{i18n>employeeType}" validated="true" subsequentSteps="WS_Intern, WS_Freelance, WS_Manager">
+                        <WizardStep id="EmployeeTypeStep" title="{i18n>employeeType}" validated="true" >
                             <MessageStrip id="MS_EmployeeType" class="sapUiSmallMarginBottom" text="{i18n>msgEmplType}" showIcon="true"/>
 
                             <HBox id="HB_EmployeeType" alignItems="Center" justifyContent="Center" width="100%">
-                                <SegmentedButton id="SB_EmployeeType" width="320px" selectionChange="setEmployeeType" selectedKey="{/Type}">
+                                <SegmentedButton id="SB_EmployeeType" width="320px" selectedKey="{employeeModel/Type}">
                                     <items>
-                                        <SegmentedButtonItem id="Btn_Intern" text="{i18n>intern}"/>
-                                        <SegmentedButtonItem id="Btn_Freelance" text="{i18n>freelance}"/>
-                                        <SegmentedButtonItem id="Btn_Manager" text="{i18n>manager}"/>
+                                        <SegmentedButtonItem id="Btn_Intern" text="{i18n>intern}" key="1"/>
+                                        <SegmentedButtonItem id="Btn_Freelance" text="{i18n>freelance}" key="2"/>
+                                        <SegmentedButtonItem id="Btn_Manager" text="{i18n>manager}" key="3"/>
                                     </items>
                                 </SegmentedButton>
                             </HBox>
                         </WizardStep>
 
                         <!--step 2: Employee Data Form-->
-                        <WizardStep id="WS_Intern" title="{i18n>employeeData}" nextStep="WS_AddData">
+                        <WizardStep id="EmployeeDataStep" title="{i18n>employeeData}" validated="true">
                             <MessageStrip id="MS_EmployeeData" class="sapUiSmallMarginBottom" text="{i18n>msgEmplData}" showIcon="true"/>
                             <form:SimpleForm id="F_EmployeeData" editable="true">
                                 <Label id="L_FirstName" text="{i18n>firstName}" required="false"/>
-                                <Input id="I_FirstName" value="{/FirstName}" valueLiveUpdate="true"/>
+                                <Input id="I_FirstName" value="{employeeModel/FirstName}" valueLiveUpdate="true"/>
 
                                 <Label id="L_LastName" text="{i18n>lastName}"/>
-                                <Input value="{/LastName}" valueLiveUpdate="true"/>
+                                <Input id="_IDGenInput1" value="{employeeModel/LastName}" valueLiveUpdate="true"/>
 
                                 <Label id="L_Dni" text="{i18n>dni}"/>
-                                <Input value="{/Dni}" valueLiveUpdate="true"/>
+                                <Input id="_IDGenInput2" value="{employeeModel/Dni}" valueLiveUpdate="true"/>
 
                                 <!--FALTA: SLIDER SALARIO BRUTO ANUAL /Salary-->
                                 <Label id="L_CreationDate" text="{i18n>creationDate}"/>
 
-                                <DatePicker id="Date_CreationDate" value="{/CreationDate}"/>
+                                <DatePicker id="Date_CreationDate" value="{employeeModel/CreationDate}"/>
                             </form:SimpleForm>
                         </WizardStep>
 
-                        <!--
-                        <WizardStep id="WS_Freelance" title="{i18n>employeeData}" nextStep="WS_AddData" activate="checkFreelanceStep">
-                            <MessageStrip class="sapUiSmallMarginBottom" text="{i18n>msgEmplData}" showIcon="true"/>
-							<form:SimpleForm editable="true">
-								<Label text="{i18n>firstName}" required="true"/>
-								<Input value="{/FirstName}" valueLiveUpdate="true"/>
-
-								<Label text="{i18n>lastName}"/>
-								<Input value="{/LastName}" valueLiveUpdate="true"/>
-
-								<Label text="{i18n>cif}"/>
-								<Input value="{/Dni}" valueLiveUpdate="true"/>
-
-								<Label text="{i18n>creationDate}"/>
-                                <DatePicker value="{/CreationDate}"/>
-							</form:SimpleForm>
-                        </WizardStep>
-
-                        <WizardStep id="WS_Manager" title="{i18n>employeeData}" nextStep="WS_AddData" activate="checkManagerStep">
-                            <MessageStrip class="sapUiSmallMarginBottom" text="{i18n>msgEmplData}" showIcon="true"/>
-							<form:SimpleForm editable="true">
-								<Label text="{i18n>firstName}" required="true"/>
-								<Input value="{/FirstName}" valueLiveUpdate="true"/>
-
-								<Label text="{i18n>lastName}"/>
-								<Input value="{/LastName}" valueLiveUpdate="true"/>
-
-								<Label text="{i18n>dni}"/>
-								<Input value="{/Dni}" valueLiveUpdate="true"/>
-
-								<Label text="{i18n>creationDate}"/>
-                                <DatePicker value="{/CreationDate}"/>
-							</form:SimpleForm>
-                        </WizardStep>
--->
-
                         <!--step 3: Additional data-->
-                        <WizardStep id="WS_AddData" title="{i18n>additionalData}" validated="true">
-                            <MessageStrip id="MS_AddData" class="sapUiSmallMarginBottom" text="{i18n>msgAddData}" showIcon="true"/>
+                        <WizardStep id="AddDataStep" title="{i18n>additionalData}" validated="true" >
+                            <MessageStrip id="AddDataMsg" class="sapUiSmallMarginBottom" text="{i18n>msgAddData}" showIcon="true"/>
+
+                            <form:SimpleForm id="AddDataForm" editable="true">
+                                <Label id="L_Comments" text="{i18n>comments}"/>
+                                <Input id="I_Comments" value="{employeeModel/Comments}"/>
+                            </form:SimpleForm>
 
                         </WizardStep>
                     </Wizard>
                 </content>
                 <footer>
-                    <OverflowToolbar>
-                        <ToolbarSpacer/>
+                    <OverflowToolbar id="_IDGenOverflowToolbar1">
+                        <ToolbarSpacer id="_IDGenToolbarSpacer1"/>
                         <Button id="Btn_Cancel" text="{i18n>btnCancel}" press="onWizardCancel"/>
                     </OverflowToolbar>
                 </footer>
@@ -102,7 +70,7 @@
                 <content>
                     <!--Review Employee data-->
                     <!--Employee type section-->
-                    <form:SimpleForm id="F_EmployeeTypeRev">
+                    <form:SimpleForm id="F_EmployeeTypeRev" title="1. Datos empleado">
                         <!--
                         <form:content>
                             <Label id="_IDGenLabel1" text="Type"/>
@@ -118,15 +86,15 @@
                         <Input id="I_FirstNameRev" value="{/FirstName}"/>
 
                         <Label id="L_LastNameRev" text="{i18n>lastName}"/>
-                        <Input value="{/LastName}"/>
+                        <Input id="_IDGenInput3" value="{employeeModel/LastName}"/>
 
                         <Label id="L_DniRev" text="{i18n>dni}"/>
-                        <Input value="{/Dni}"/>
+                        <Input id="_IDGenInput4" value="{employeeModel/Dni}"/>
 
                         <!--FALTA: SLIDER SALARIO BRUTO ANUAL /Salary-->
                         <Label id="L_CreationDateRev" text="{i18n>creationDate}"/>
 
-                        <DatePicker id="Date_CreationDateRev" value="{/CreationDate}"/>
+                        <DatePicker id="Date_CreationDateRev" value="{employeeModel/CreationDate}"/>
                     </form:SimpleForm>
 
                     <!--Additional data section-->
