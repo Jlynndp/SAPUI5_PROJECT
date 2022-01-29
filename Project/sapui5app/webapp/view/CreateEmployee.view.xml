@@ -8,17 +8,17 @@
         <pages>
             <Page id="wizardContentPage" showHeader="false">
                 <content>
-                    <Wizard id="CreateEmployeeWizard" class="sapUiResponsivePadding--header sapUiResponsivePadding--content" complete="onWizardCompleted">
+                    <Wizard id="CreateEmployeeWizard" class="sapUiResponsivePadding--header sapUiResponsivePadding--content" complete="onWizardCompleted" finishButtonText="{i18n>btnReview}">
 
                         <!--step 1: Employee Type selection-->
                         <WizardStep id="EmployeeTypeStep" title="{i18n>employeeType}" validated="false">
                             <MessageStrip class="sapUiSmallMarginBottom" text="{i18n>msgEmplType}" showIcon="true"/>
                             <HBox alignItems="Center" justifyContent="Center" width="100%">
-                                <SegmentedButton width="320px" selectionChange="setEmployeeType">
+                                <SegmentedButton width="320px" selectionChange="setEmployeeType" selectedKey="/EmployeeType">
                                     <items>
-                                        <SegmentedButtonItem text="{i18n>intern}"/>
-                                        <SegmentedButtonItem text="{i18n>freelance}"/>
-                                        <SegmentedButtonItem text="{i18n>manager}"/>
+                                        <SegmentedButtonItem text="{i18n>intern}" key="0"/>
+                                        <SegmentedButtonItem text="{i18n>freelance}" key="1"/>
+                                        <SegmentedButtonItem text="{i18n>manager}" key="2"/>
                                     </items>
                                 </SegmentedButton>
                             </HBox>
@@ -73,10 +73,23 @@
                         <!--step 3: Additional data-->
                         <WizardStep id="AdditionalDataStep" validated="true" title="{i18n>additionalData}">
                             <MessageStrip class="sapUiSmallMarginBottom" text="{i18n>msgAddData}" showIcon="true"/>
-                            <form:SimpleForm editable="true">
+                            <!-- <form:SimpleForm editable="true"> -->
 
                                 <Label text="{i18n>comments}"/>
-                                <Input value="{/Comments}"/>
+                                <TextArea id="TextArea" cols="200" height="100px" value="{/Comments}"/>
+                            <!-- </form:SimpleForm> -->
+
+                            <Panel>
+                                    <!--component to upload files FilesSet-->
+                                <UploadCollection id="fileUpload" maximumFilenameLength="55" 
+                                                  maximumFileSize="10" multiple="true" 
+                                                  sameFilenameAllowed="true" instantUpload="true"
+                                                  numberOfAttachmentsText="{i18n>attachment}"
+                                                  uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments" 
+                                                  change="onFileChange" uploadComplete="onFileUploadComplete" 
+                                                  beforeUploadStarts="onFileBeforeUpload" fileDeleted="onFileDeleted" 
+                                                  />
+                            </Panel>
 
                                 <!--
                                 <Label text="Cover photo"/>
@@ -100,7 +113,7 @@
                                     <core:Item key="Z" text="Z"/>
                                 </ComboBox>-->
 
-                            </form:SimpleForm>
+
                         </WizardStep>
                         <!--
 							<WizardStep id="PricingStep" activate="pricingActivate" complete="pricingComplete" validated="true" title="Pricing">
@@ -133,7 +146,7 @@
                     <form:SimpleForm title="1. {i18n>employeeType}" minWidth="1024" editable="false" layout="ResponsiveGridLayout">
                         <form:content>
                             <Label text="{i18n>type}"/>
-                            <Text text="{/EmployeeType}"/>
+                            <Text  text="{= ${/EmployeeType}==='0' ? ${i18n>intern} : ${/EmployeeType}==='1' ? ${i18n>freelance} : ${/EmployeeType}==='2' ? ${i18n>manager} : ''}"/>
 
                             <Link press="editStepOne" text="Edit" />
                         </form:content>
@@ -170,6 +183,7 @@
                     <!--step 3: Additional data-->
                     <form:SimpleForm title="3. {i18n>additionalData}" minWidth="1024" editable="false" layout="ResponsiveGridLayout">
                         <form:content>
+
                             <Label text="{i18n>comments}"/>
                             <Text text="{/Comments}"/>
                             <Label text="{i18n>documents}"/>

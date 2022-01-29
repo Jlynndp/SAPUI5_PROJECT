@@ -1,4 +1,59 @@
 <mvc:View controllerName="logaligroup.sapui5app.controller.ShowEmployee" displayBlock="true"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m">
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:mvc="sap.ui.core.mvc">
+    <f:DynamicPage id="dynamicPageId" toggleHeaderOnTitleClick="false">
+        <!-- DynamicPage Title -->
+        <!-- <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="Products ({products>/ProductCollectionStats/Counts/Total})"/>
+                </f:heading>
+            </f:DynamicPageTitle>
+        </f:title> -->
+
+        <!-- DynamicPage Content -->
+        <f:content>
+            <Table id="employeeTable" inset="false" items="{employeeModel>/Users}" class="sapFDynamicPageAlignContent" width="auto">
+                <headerToolbar>
+                    <OverflowToolbar>
+                        <ToolbarSpacer/>
+                        <SearchField search="onSearch" width="17.5rem"/>
+                    </OverflowToolbar>
+                </headerToolbar>
+            <columns>
+                <Column visible="true">
+                    <header>
+                        <Label text="{i18n>firstName}"/>
+                    </header>
+                </Column>
+                <Column visible="true">
+                    <header>
+                        <Label text="{i18n>dni}"/>
+                    </header>
+                </Column>
+            </columns>
+
+
+                <items>
+               <!--<ColumnListItem type="Active" press="showPostalcode">-->
+                <ColumnListItem type="Navigation" press="showEmployeeDetail">
+                    <cells>
+                        <Label text="{employeeModel>LastName}"/>
+                        <Label text="{employeeModel>Dni}"/>
+                    </cells>
+                </ColumnListItem>
+                </items>
+            </Table>
+        </f:content>
+
+        <!-- DynamicPage Footer -->
+        <f:footer>
+            <OverflowToolbar>
+                <ToolbarSpacer/>
+                <Button type="Accept" text="Accept"/>
+                <Button type="Reject" text="Reject"/>
+            </OverflowToolbar>
+        </f:footer>
+    </f:DynamicPage>
 </mvc:View>

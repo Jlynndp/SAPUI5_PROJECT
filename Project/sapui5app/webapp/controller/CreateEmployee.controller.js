@@ -40,7 +40,7 @@ sap.ui.define([
 		// },
 
 		setEmployeeType: function (oEvent) {
-			var employeeType = oEvent.getParameters().item.getText();
+			var employeeType = oEvent.getParameters().item.getKey();
 			this.model.setProperty("/EmployeeType", employeeType);
 			this._wizard.validateStep(this.byId("EmployeeTypeStep"));
             // this._wizard.goToStep("EmployeeDataStep");
@@ -159,10 +159,17 @@ sap.ui.define([
 
 		onWizardCancel: function () {
 			this._handleMessageBoxOpen("Are you sure you want to cancel your report?", "warning");
+
+            //back to Menu
 		},
 
 		onWizardSubmit: function () {
 			this._handleMessageBoxOpen("Are you sure you want to submit your report?", "confirm");
+
+            //submit Employee: “/sap/opu/odata/sap/ZEMPLOYEES_SRV/Users”
+
+            //upload attachments: “/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments”
+
 		},
 
 		// productWeighStateFormatter: function (val) {
