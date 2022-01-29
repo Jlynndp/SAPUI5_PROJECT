@@ -103,6 +103,13 @@
                     "target": [
                         "TargetCreateEmployee"
                     ]
+                },
+                {
+                    "name": "RouteShowEmployee",
+                    "pattern": "ShowEmployee",
+                    "target": [
+                        "TargetShowEmployee"
+                    ]
                 }
             ],
             "targets": {
@@ -117,6 +124,11 @@
                     "viewType": "XML",
                     "viewId": "CreateEmployee",
                     "viewName": "CreateEmployee"
+                },
+                "TargetShowEmployee": {
+                    "viewType": "XML",
+                    "viewId": "ShowEmployee",
+                    "viewName": "ShowEmployee"
                 }
             }
         },

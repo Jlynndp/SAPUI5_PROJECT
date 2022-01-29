@@ -13,18 +13,15 @@ sap.ui.define([
 
         function navToCreateEmployee() {
             //call Create Employee view
-            // this.getRouter().navTo("RouteCreateEmployee");
-            // sap.ui.core.UIComponent.getRouterFor(this).navTo("RouteCreateEmployee");
              this.getOwnerComponent().getRouter().navTo("RouteCreateEmployee");
         };
 
         function navToShowEmployee() {
-            //this.getOwnerComponent().getRouter().navTo("RouteShowEmployee");
+            //call Show Employee view
+            this.getOwnerComponent().getRouter().navTo("RouteShowEmployee");
         };
 
         function navToSignPurchase() {
-            //window.open("http://bc735977trial-dev-logali-approuter.cfapps.us10.hana.ondemand.com");
-            //open app "http://bc735977trial-dev-logali-approuter.cfapps.us10.hana.ondemand.com"
         };
 
         //prototype

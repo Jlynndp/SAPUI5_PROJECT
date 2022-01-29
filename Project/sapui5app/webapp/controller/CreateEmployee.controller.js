@@ -1,83 +1,192 @@
 sap.ui.define([
-    'sap/ui/core/mvc/Controller',
-    'sap/ui/model/json/JSONModel',
-    'sap/m/MessageToast',
-],
+	'sap/ui/core/mvc/Controller',
+	'sap/ui/model/json/JSONModel',
+	"sap/m/MessageToast",
+	"sap/m/MessageBox"
+], function (Controller, JSONModel, MessageToast, MessageBox) {
+	"use strict";
 
-    /**
-     * @param {typeof sap.ui.core.mvc.Controller} Controller
-     * @param {typeof sap.ui.model.json.JSONModel} JSONModel
-     */
-    function (Controller, JSONModel, MessageToast) {
-        'use strict';
+	return Controller.extend("logaligroup.sapui5app.controller.CreateEmployee", {
+		 onInit: function () {
+			this._wizard = this.byId("CreateEmployeeWizard");
+			this._oNavContainer = this.byId("wizardNavContainer");
+			this._oWizardContentPage = this.byId("wizardContentPage");
 
-        function onInit() {
-            this._wizard = this.getView().byId("CreateEmployeeWizard");
-            this._oNavContainer = this.getView().byId("NC_CreateEmployee");
-            this._oWizardContentPage = this.getView().byId("Pg_CreateEmployee");
-       };
+			this.model = new JSONModel();
+			// this.model.setData({
+			// 	productNameState: "Error",
+			// 	productWeightState: "Error"
+			// });
+			this.getView().setModel(this.model);
+			// this.model.setProperty("/employeeType", "");
+			// this.model.setProperty("/availabilityType", "In Store");
+			// this.model.setProperty("/navApiEnabled", true);
+			// this.model.setProperty("/productVAT", false);
+			// this.model.setProperty("/measurement", "");
+			// this._setEmptyValue("/productManufacturer");
+			// this._setEmptyValue("/productDescription");
+			// this._setEmptyValue("/size");
+			// this._setEmptyValue("/productPrice");
+			// this._setEmptyValue("/manufacturingDate");
+            // this._setEmptyValue("/discountGroup");
 
+		},
 
-        function setEmployeeType(oEvent) {
-            // //get employee type
-            // var employeeType = oEvent.getParameters().item.getText();
-            // this.model.setProperty("/Type", employeeType);
-            // this._wizard.validateStep(this.byId("WS_EmployeeType"));
+		// setProductType: function (oEvent) {
+		// 	var productType = oEvent.getSource().getTitle();
+		// 	this.model.setProperty("/productType", productType);
+		// 	this.byId("ProductStepChosenType").setText("Chosen product type: " + productType);
+		// 	this._wizard.validateStep(this.byId("ProductTypeStep"));
+		// },
 
-            //var employeeType = oEvent.getParameters().item.getKey();
-            //this.model.setProperty("/employeeType", employeeType);
+		setEmployeeType: function (oEvent) {
+			var employeeType = oEvent.getParameters().item.getText();
+			this.model.setProperty("/EmployeeType", employeeType);
+			this._wizard.validateStep(this.byId("EmployeeTypeStep"));
+            // this._wizard.goToStep("EmployeeDataStep");
+             //this._handleNavigationToStep(1);
 
-            this._wizard.validateStep(this.byId("EmployeeTypeStep"));
-        };
+		},
 
+		// additionalInfoValidation: function () {
+		// 	var name = this.byId("ProductName").getValue();
+		// 	var weight = parseInt(this.byId("ProductWeight").getValue());
 
-        function employeeDataValidation() {
-            // var name = this.byId("ProductName").getValue();
-            // var weight = parseInt(this.byId("ProductWeight").getValue());
+		// 	if (isNaN(weight)) {
+		// 		this.model.setProperty("/productWeightState", "Error");
+		// 	} else {
+		// 		this.model.setProperty("/productWeightState", "None");
+		// 	}
 
-            // if (isNaN(weight)) {
-            //     this.model.setProperty("/productWeightState", "Error");
-            // } else {
-            //     this.model.setProperty("/productWeightState", "None");
-            // }
+		// 	if (name.length < 6) {
+		// 		this.model.setProperty("/productNameState", "Error");
+		// 	} else {
+		// 		this.model.setProperty("/productNameState", "None");
+		// 	}
 
-            // if (name.length < 6) {
-            //     this.model.setProperty("/productNameState", "Error");
-            // } else {
-            //     this.model.setProperty("/productNameState", "None");
-            // }
+		// 	if (name.length < 6 || isNaN(weight)) {
+		// 		this._wizard.invalidateStep(this.byId("ProductInfoStep"));
+		// 	} else {
+		// 		this._wizard.validateStep(this.byId("ProductInfoStep"));
+		// 	}
+		// },
 
-            // if (name.length < 6 || isNaN(weight)) {
-            //     this._wizard.invalidateStep(this.byId("ProductInfoStep"));
-            // } else {
-                this._wizard.validateStep(this.byId("EmployeeDataStep"));
-            // }
-        };
+		// optionalStepActivation: function () {
+		// 	MessageToast.show(
+		// 		'This event is fired on activate of Step3.'
+		// 	);
+		// },
 
-        function addDataValidation(){
-            this._wizard.validateStep(this.byId("AddDataStep"));
+		// optionalStepCompletion: function () {
+		// 	MessageToast.show(
+		// 		'This event is fired on complete of Step3. You can use it to gather the information, and lock the input data.'
+		// 	);
+		// },
 
-			MessageToast.show(
-				'This event is fired on activate of Step3.'
-			);
-        };
+		// pricingActivate: function () {
+		// 	this.model.setProperty("/navApiEnabled", true);
+		// },
 
-        function addDataComplete(){
-            this.model.setProperty("/navApiEnabled", false);
-        };
+		// pricingComplete: function () {
+		// 	this.model.setProperty("/navApiEnabled", false);
+		// },
 
+		// scrollFrom4to2: function () {
+		// 	this._wizard.goToStep(this.byId("ProductInfoStep"));
+		// },
 
-        function onWizardCompleted() {
-             this._oNavContainer.to(this.byId("Pg_Review"));
-        };
+		// goFrom4to3: function () {
+		// 	if (this._wizard.getProgressStep() === this.byId("PricingStep")) {
+		// 		this._wizard.previousStep();
+		// 	}
+		// },
 
-        //prototype
-        var CreateEmpl = Controller.extend("logaligroup.sapui5app.controller.CreateEmployee", {});
-        CreateEmpl.prototype.onInit = onInit;
-        CreateEmpl.setEmployeeType = setEmployeeType;
-        CreateEmpl.employeeDataValidation = employeeDataValidation;
-        CreateEmpl.addDataValidation = addDataValidation;
-        CreateEmpl.addDataComplete = addDataComplete;
-        CreateEmpl.onWizardCompleted = onWizardCompleted;
-        return CreateEmpl;
-    });
+		// goFrom4to5: function () {
+		// 	if (this._wizard.getProgressStep() === this.byId("PricingStep")) {
+		// 		this._wizard.nextStep();
+		// 	}
+		// },
+
+		onWizardCompleted: function () {
+			this._oNavContainer.to(this.byId("wizardReviewPage"));
+		},
+
+		backToWizardContent: function () {
+			this._oNavContainer.backToPage(this._oWizardContentPage.getId());
+		},
+
+		editStepOne: function () {
+			this._handleNavigationToStep(0);
+		},
+
+		editStepTwo: function () {
+			this._handleNavigationToStep(1);
+		},
+
+		editStepThree: function () {
+			this._handleNavigationToStep(2);
+		},
+
+		// editStepFour: function () {
+		// 	this._handleNavigationToStep(3);
+		// },
+
+		_handleNavigationToStep: function (iStepNumber) {
+			var fnAfterNavigate = function () {
+				this._wizard.goToStep(this._wizard.getSteps()[iStepNumber]);
+				this._oNavContainer.detachAfterNavigate(fnAfterNavigate);
+			}.bind(this);
+
+			this._oNavContainer.attachAfterNavigate(fnAfterNavigate);
+			this.backToWizardContent();
+		},
+
+		_handleMessageBoxOpen: function (sMessage, sMessageBoxType) {
+			MessageBox[sMessageBoxType](sMessage, {
+				actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+				onClose: function (oAction) {
+					if (oAction === MessageBox.Action.YES) {
+						this._handleNavigationToStep(0);
+						this._wizard.discardProgress(this._wizard.getSteps()[0]);
+					}
+				}.bind(this)
+			});
+		},
+
+		// _setEmptyValue: function (sPath) {
+		// 	this.model.setProperty(sPath, "n/a");
+		// },
+
+		onWizardCancel: function () {
+			this._handleMessageBoxOpen("Are you sure you want to cancel your report?", "warning");
+		},
+
+		onWizardSubmit: function () {
+			this._handleMessageBoxOpen("Are you sure you want to submit your report?", "confirm");
+		},
+
+		// productWeighStateFormatter: function (val) {
+		// 	return isNaN(val) ? "Error" : "None";
+		// },
+
+		discardProgress: function () {
+			this._wizard.discardProgress(this.byId("EmployeeTypeStep"));
+
+			var clearContent = function (content) {
+				for (var i = 0; i < content.length; i++) {
+					if (content[i].setValue) {
+						content[i].setValue("");
+					}
+
+					if (content[i].getContent) {
+						clearContent(content[i].getContent());
+					}
+				}
+			};
+
+			// this.model.setProperty("/productWeightState", "Error");
+			// this.model.setProperty("/productNameState", "Error");
+			clearContent(this._wizard.getSteps());
+		}
+	});
+});

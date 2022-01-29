@@ -1,118 +1,193 @@
 <mvc:View controllerName="logaligroup.sapui5app.controller.CreateEmployee" displayBlock="true"
-    xmlns="sap.m"
-    xmlns:mvc="sap.ui.core.mvc"
     xmlns:form="sap.ui.layout.form"
-    xmlns:core="sap.ui.core">
-
-    <NavContainer id="NC_CreateEmployee">
+    xmlns:core="sap.ui.core"
+    xmlns:u="sap.ui.unified"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <NavContainer id="wizardNavContainer">
         <pages>
-            <!--Create Employee Wizard-->
-            <Page id="Pg_CreateEmployee" title="{i18n>createEmployee}" class="sapUiResponsivePadding--header" showHeader="false">
+            <Page id="wizardContentPage" showHeader="false">
                 <content>
                     <Wizard id="CreateEmployeeWizard" class="sapUiResponsivePadding--header sapUiResponsivePadding--content" complete="onWizardCompleted">
 
                         <!--step 1: Employee Type selection-->
-                        <WizardStep id="EmployeeTypeStep" title="{i18n>employeeType}" validated="true" >
-                            <MessageStrip id="MS_EmployeeType" class="sapUiSmallMarginBottom" text="{i18n>msgEmplType}" showIcon="true"/>
-
-                            <HBox id="HB_EmployeeType" alignItems="Center" justifyContent="Center" width="100%">
-                                <SegmentedButton id="SB_EmployeeType" width="320px" selectedKey="{employeeModel/Type}">
+                        <WizardStep id="EmployeeTypeStep" title="{i18n>employeeType}" validated="false">
+                            <MessageStrip class="sapUiSmallMarginBottom" text="{i18n>msgEmplType}" showIcon="true"/>
+                            <HBox alignItems="Center" justifyContent="Center" width="100%">
+                                <SegmentedButton width="320px" selectionChange="setEmployeeType">
                                     <items>
-                                        <SegmentedButtonItem id="Btn_Intern" text="{i18n>intern}" key="1"/>
-                                        <SegmentedButtonItem id="Btn_Freelance" text="{i18n>freelance}" key="2"/>
-                                        <SegmentedButtonItem id="Btn_Manager" text="{i18n>manager}" key="3"/>
+                                        <SegmentedButtonItem text="{i18n>intern}"/>
+                                        <SegmentedButtonItem text="{i18n>freelance}"/>
+                                        <SegmentedButtonItem text="{i18n>manager}"/>
                                     </items>
                                 </SegmentedButton>
                             </HBox>
                         </WizardStep>
 
                         <!--step 2: Employee Data Form-->
-                        <WizardStep id="EmployeeDataStep" title="{i18n>employeeData}" validated="true">
-                            <MessageStrip id="MS_EmployeeData" class="sapUiSmallMarginBottom" text="{i18n>msgEmplData}" showIcon="true"/>
-                            <form:SimpleForm id="F_EmployeeData" editable="true">
-                                <Label id="L_FirstName" text="{i18n>firstName}" required="false"/>
-                                <Input id="I_FirstName" value="{employeeModel/FirstName}" valueLiveUpdate="true"/>
+                        <WizardStep id="EmployeeDataStep" title="{i18n>employeeData}">
+                            <!-- validated="false" activate="additionalInfoValidation">-->
+                            <MessageStrip class="sapUiSmallMarginBottom" text="{i18n>msgEmplData}" showIcon="true"/>
+                            <form:SimpleForm editable="true">
 
-                                <Label id="L_LastName" text="{i18n>lastName}"/>
-                                <Input id="_IDGenInput1" value="{employeeModel/LastName}" valueLiveUpdate="true"/>
+                                <Label text="{i18n>firstName}" required="true"/>
+                                <Input value="{/FirstName}" valueLiveUpdate="true"/>
 
-                                <Label id="L_Dni" text="{i18n>dni}"/>
-                                <Input id="_IDGenInput2" value="{employeeModel/Dni}" valueLiveUpdate="true"/>
+                                <Label text="{i18n>lastName}" required="true"/>
+                                <Input value="{/LastName}" valueLiveUpdate="true"/>
 
-                                <!--FALTA: SLIDER SALARIO BRUTO ANUAL /Salary-->
-                                <Label id="L_CreationDate" text="{i18n>creationDate}"/>
+                                <Label text="{i18n>dni}" required="true"/>
+                                <Input value="{/Dni}" valueLiveUpdate="true"/>
 
-                                <DatePicker id="Date_CreationDate" value="{employeeModel/CreationDate}"/>
+                                <Label text="{i18n>cif}" required="true"/>
+                                <Input value="{/Dni}" valueLiveUpdate="true"/>
+
+                                <Label text="{i18n>annualSalary}"/>
+                                <Slider enableTickmarks="true" min="12000" max="80000" value="24000" step="2000" />
+
+                                <Label text="{i18n>dailyPrice}"/>
+                                <Slider enableTickmarks="true" min="100" max="2000" value="400" step="100" class="sapUiMediumMarginBottom" width="80%" />
+
+                                <Label text="{i18n>creationDate}" required="true"/>
+                                <DatePicker value="{/CreationDate}"/>
+
+                                <!--                                
+                                <Input valueStateText="Enter 6 symbols or more" valueState="{/productNameState}" id="ProductName" liveChange="additionalInfoValidation" placeholder="Enter name with length greater than 6" value="{/productName}"/>
+
+                                <Label text="Weight" required="true"/>
+                                <Input valueStateText="Enter digits" valueState="{/productWeightState}" id="ProductWeight" liveChange="additionalInfoValidation" type="Number" placeholder="Enter digits" value="{/productWeight}"/>
+                                <Label text="Manufacturer"/>
+                                <Select selectedKey="{/productManufacturer}">
+                                    <core:Item key="Apple" text="Apple"/>
+                                    <core:Item key="Microsoft" text="Microsoft"/>
+                                    <core:Item key="Google" text="Google"/>
+                                    <core:Item key="Sony" text="Sony"/>
+                                    <core:Item key="Samsung" text="Samsung"/>
+                                    <core:Item key="Logitech" text="Logitech"/>
+                                </Select>
+                                <Label text="Description"/>
+                                <TextArea value="{/productDescription}" rows="8"/>-->
                             </form:SimpleForm>
                         </WizardStep>
 
                         <!--step 3: Additional data-->
-                        <WizardStep id="AddDataStep" title="{i18n>additionalData}" validated="true" >
-                            <MessageStrip id="AddDataMsg" class="sapUiSmallMarginBottom" text="{i18n>msgAddData}" showIcon="true"/>
+                        <WizardStep id="AdditionalDataStep" validated="true" title="{i18n>additionalData}">
+                            <MessageStrip class="sapUiSmallMarginBottom" text="{i18n>msgAddData}" showIcon="true"/>
+                            <form:SimpleForm editable="true">
 
-                            <form:SimpleForm id="AddDataForm" editable="true">
-                                <Label id="L_Comments" text="{i18n>comments}"/>
-                                <Input id="I_Comments" value="{employeeModel/Comments}"/>
+                                <Label text="{i18n>comments}"/>
+                                <Input value="{/Comments}"/>
+
+                                <!--
+                                <Label text="Cover photo"/>
+                                <u:FileUploader width="100%" tooltip="Upload product cover photo to the local server" style="Emphasized" placeholder="Choose a file for Upload..."/>
+                                <Label text="Manufacturing date"/>
+                                <DatePicker id="DP3" displayFormat="short" value="{/manufacturingDate}"/>
+                                <Label text="Availability"/>
+                                <SegmentedButton selectedKey="{/availabilityType}">
+                                    <items>
+                                        <SegmentedButtonItem key="In store" text="In store"/>
+                                        <SegmentedButtonItem key="In depot" text="In depot"/>
+                                        <SegmentedButtonItem key="In repository" text="In repository"/>
+                                        <SegmentedButtonItem key="Out of stock" text="Out of stock"/>
+                                    </items>
+                                </SegmentedButton>
+                                <Label text="Size"/>
+                                <Input value="{/size}"/>
+                                <ComboBox maxWidth="100px" selectedKey="{/measurement}">
+                                    <core:Item key="X" text="X"/>
+                                    <core:Item key="Y" text="Y"/>
+                                    <core:Item key="Z" text="Z"/>
+                                </ComboBox>-->
+
                             </form:SimpleForm>
-
                         </WizardStep>
+                        <!--
+							<WizardStep id="PricingStep" activate="pricingActivate" complete="pricingComplete" validated="true" title="Pricing">
+								<MessageStrip class="sapUiSmallMarginBottom" text="You can use the wizard previousStep() and nextStep() methods to navigate from step to step without validation. Also you can use the GoToStep(step) method to scroll programmatically to previously visited steps." showIcon="true"/> <form:SimpleForm editable="true">
+									<Label text="Price"/>
+									<Input value="{/productPrice}"/>
+									<Label text="Discount group"/>
+									<ComboBox selectedKey="{/discountGroup}">
+										<core:Item key="Kids" text="Kids"/>
+										<core:Item key="Teens" text="Teens"/>
+										<core:Item key="Adults" text="Adults"/>
+										<core:Item key="Elderly" text="Elderly"/>
+									</ComboBox>
+									<Label text=" VAT is included"/>
+									<CheckBox selected="{/productVAT}"/>
+								</form:SimpleForm>
+							</WizardStep>-->
                     </Wizard>
                 </content>
                 <footer>
-                    <OverflowToolbar id="_IDGenOverflowToolbar1">
-                        <ToolbarSpacer id="_IDGenToolbarSpacer1"/>
-                        <Button id="Btn_Cancel" text="{i18n>btnCancel}" press="onWizardCancel"/>
+                    <OverflowToolbar>
+                        <ToolbarSpacer/>
+                        <Button text="{i18n>btnCancel}" press="onWizardCancel"/>
                     </OverflowToolbar>
                 </footer>
             </Page>
-
-            <Page id="Pg_Review" showHeader="false">
+            <Page id="wizardReviewPage" showHeader="false">
                 <content>
-                    <!--Review Employee data-->
-                    <!--Employee type section-->
-                    <form:SimpleForm id="F_EmployeeTypeRev" title="1. Datos empleado">
-                        <!--
+                    <!--step 1: Employee Type-->
+                    <form:SimpleForm title="1. {i18n>employeeType}" minWidth="1024" editable="false" layout="ResponsiveGridLayout">
                         <form:content>
-                            <Label id="_IDGenLabel1" text="Type"/>
-                            <Text id="ProductTypeChosen" text="{/productType}"/>
-                            <Link id="_IDGenLink1" press="editStepOne" text="Edit" />
+                            <Label text="{i18n>type}"/>
+                            <Text text="{/EmployeeType}"/>
+
+                            <Link press="editStepOne" text="Edit" />
                         </form:content>
-                        -->
                     </form:SimpleForm>
 
-                    <!--Employee data section-->
-                    <form:SimpleForm id="F_EmployeeDataRev">
-                        <Label id="L_FirstNameRev" text="{i18n>firstName}"/>
-                        <Input id="I_FirstNameRev" value="{/FirstName}"/>
+                    <!--step 2: Employee Data-->
+                    <form:SimpleForm title="2. {i18n>employeeData}" minWidth="1024" editable="false" layout="ResponsiveGridLayout">
+                        <form:content>
+                            <Label text="{i18n>firstName}"/>
+                            <Text text="{/FirstName}"/>
 
-                        <Label id="L_LastNameRev" text="{i18n>lastName}"/>
-                        <Input id="_IDGenInput3" value="{employeeModel/LastName}"/>
+                            <Label text="{i18n>lastName}"/>
+                            <Text text="{/LastName}"/>
 
-                        <Label id="L_DniRev" text="{i18n>dni}"/>
-                        <Input id="_IDGenInput4" value="{employeeModel/Dni}"/>
+                            <Label text="{i18n>dni}"/>
+                            <Text text="{/Dni}"/>
 
-                        <!--FALTA: SLIDER SALARIO BRUTO ANUAL /Salary-->
-                        <Label id="L_CreationDateRev" text="{i18n>creationDate}"/>
+                            <Label text="{i18n>cif}"/>
+                            <Text text="{/Dni}"/>
 
-                        <DatePicker id="Date_CreationDateRev" value="{employeeModel/CreationDate}"/>
+                            <Label text="{i18n>annualSalary}"/>
+                            <Text text="{/Salary}"/>
+
+                            <Label text="{i18n>dailyPrice}"/>
+                            <Text text="{/Salary}"/>
+
+                            <Label text="{i18n>creationDate}"/>
+                            <Text text="{/CreationDate}"/>
+
+                            <Link press="editStepTwo" text="Edit" />
+                        </form:content>
                     </form:SimpleForm>
 
-                    <!--Additional data section-->
-                    <form:SimpleForm id="F_AddDataRev">
+                    <!--step 3: Additional data-->
+                    <form:SimpleForm title="3. {i18n>additionalData}" minWidth="1024" editable="false" layout="ResponsiveGridLayout">
+                        <form:content>
+                            <Label text="{i18n>comments}"/>
+                            <Text text="{/Comments}"/>
+                            <Label text="{i18n>documents}"/>
+
+                            <Link press="editStepThree" text="Edit" />
+                        </form:content>
                     </form:SimpleForm>
+
                 </content>
-
                 <footer>
-                    <Bar id="Bar_FooterRev">
+                    <Bar>
                         <contentRight>
-                            <Button id="Btn_SubmitRev" text="{i18n>btnSubmit}" press="onWizardSubmit"/>
-                            <Button id="Btn_CancelRev" text="{i18n>btnCancel}" press="onWizardCancel"/>
+                            <Button text="{i18n>btnSubmit}" press="onWizardSubmit"/>
+                            <Button text="{i18n>btnCancel}" press="onWizardCancel"/>
                         </contentRight>
                     </Bar>
                 </footer>
-
             </Page>
-
         </pages>
     </NavContainer>
 </mvc:View>
