@@ -8,13 +8,13 @@
         <pages>
             <Page id="wizardContentPage" showHeader="false">
                 <content>
-                    <Wizard id="CreateEmployeeWizard" class="sapUiResponsivePadding--header sapUiResponsivePadding--content" complete="onWizardCompleted" finishButtonText="{i18n>btnReview}">
+                    <Wizard id="CreateEmployeeWizard" class="sapUiResponsivePadding--header sapUiResponsivePadding--content" complete="onWizardCompleted" finishButtonText="{i18n>btnReview}" enableBranching="true" showNextButton="true">
 
                         <!--step 1: Employee Type selection-->
-                        <WizardStep id="EmployeeTypeStep" title="{i18n>employeeType}" validated="false">
+                        <WizardStep id="EmployeeTypeStep" title="{i18n>employeeType}" validated="false" nextStep="EmployeeDataStep" complete="goToDataStep">
                             <MessageStrip class="sapUiSmallMarginBottom" text="{i18n>msgEmplType}" showIcon="true"/>
                             <HBox alignItems="Center" justifyContent="Center" width="100%">
-                                <SegmentedButton width="320px" selectionChange="setEmployeeType" selectedKey="/EmployeeType">
+                                <SegmentedButton width="320px" selectionChange="setEmployeeType" selectedKey="/EmployeeType" selectedItem="">
                                     <items>
                                         <SegmentedButtonItem text="{i18n>intern}" key="0"/>
                                         <SegmentedButtonItem text="{i18n>freelance}" key="1"/>
@@ -25,7 +25,7 @@
                         </WizardStep>
 
                         <!--step 2: Employee Data Form-->
-                        <WizardStep id="EmployeeDataStep" title="{i18n>employeeData}">
+                        <WizardStep id="EmployeeDataStep" title="{i18n>employeeData}" nextStep="AdditionalDataStep">
                             <!-- validated="false" activate="additionalInfoValidation">-->
                             <MessageStrip class="sapUiSmallMarginBottom" text="{i18n>msgEmplData}" showIcon="true"/>
                             <form:SimpleForm editable="true">
@@ -36,37 +36,26 @@
                                 <Label text="{i18n>lastName}" required="true"/>
                                 <Input value="{/LastName}" valueLiveUpdate="true"/>
 
-                                <Label text="{i18n>dni}" required="true"/>
+                                <Label text="{jsonModelConfig>/dniLabel}" required="true"/>
                                 <Input value="{/Dni}" valueLiveUpdate="true"/>
 
-                                <Label text="{i18n>cif}" required="true"/>
-                                <Input value="{/Dni}" valueLiveUpdate="true"/>
+                                <!-- <Label text="{i18n>cif}" required="true"/>
+                                <Input value="{/Dni}" valueLiveUpdate="true"/> -->
+
+                                <Label text="{jsonModelConfig>/salaryLabel}"/>
+                                <Slider enableTickmarks="true" class="sapUiSmallMarginBottom" 
+                                        min="{jsonModelConfig>/salaryMin}" 
+                                        max="{jsonModelConfig>/salaryMax}" 
+                                        value="{jsonModelConfig>/salaryValue}" width="auto" progress="true" step="{jsonModelConfig>/salaryStep}"/>
+
+                                <!-- <Label text="{i18n>dailyPrice}"/>
+                                <Slider enableTickmarks="true" class="sapUiSmallMarginBottom" min="100" max="2000" value="400" step="100" width="80%" />
 
                                 <Label text="{i18n>annualSalary}"/>
-                                <Slider enableTickmarks="true" min="12000" max="80000" value="24000" step="2000" />
-
-                                <Label text="{i18n>dailyPrice}"/>
-                                <Slider enableTickmarks="true" min="100" max="2000" value="400" step="100" class="sapUiMediumMarginBottom" width="80%" />
+                                <Slider enableTickmarks="true" class="sapUiSmallMarginBottom" min="12000" max="80000" value="24000" step="2000" /> -->
 
                                 <Label text="{i18n>creationDate}" required="true"/>
                                 <DatePicker value="{/CreationDate}"/>
-
-                                <!--                                
-                                <Input valueStateText="Enter 6 symbols or more" valueState="{/productNameState}" id="ProductName" liveChange="additionalInfoValidation" placeholder="Enter name with length greater than 6" value="{/productName}"/>
-
-                                <Label text="Weight" required="true"/>
-                                <Input valueStateText="Enter digits" valueState="{/productWeightState}" id="ProductWeight" liveChange="additionalInfoValidation" type="Number" placeholder="Enter digits" value="{/productWeight}"/>
-                                <Label text="Manufacturer"/>
-                                <Select selectedKey="{/productManufacturer}">
-                                    <core:Item key="Apple" text="Apple"/>
-                                    <core:Item key="Microsoft" text="Microsoft"/>
-                                    <core:Item key="Google" text="Google"/>
-                                    <core:Item key="Sony" text="Sony"/>
-                                    <core:Item key="Samsung" text="Samsung"/>
-                                    <core:Item key="Logitech" text="Logitech"/>
-                                </Select>
-                                <Label text="Description"/>
-                                <TextArea value="{/productDescription}" rows="8"/>-->
                             </form:SimpleForm>
                         </WizardStep>
 
@@ -75,62 +64,15 @@
                             <MessageStrip class="sapUiSmallMarginBottom" text="{i18n>msgAddData}" showIcon="true"/>
                             <!-- <form:SimpleForm editable="true"> -->
 
-                                <Label text="{i18n>comments}"/>
-                                <TextArea id="TextArea" cols="200" height="100px" value="{/Comments}"/>
+                            <Label text="{i18n>comments}"/>
+                            <TextArea id="TextArea" cols="200" height="100px" value="{/Comments}"/>
                             <!-- </form:SimpleForm> -->
 
                             <Panel>
-                                    <!--component to upload files FilesSet-->
-                                <UploadCollection id="fileUpload" maximumFilenameLength="55" 
-                                                  maximumFileSize="10" multiple="true" 
-                                                  sameFilenameAllowed="true" instantUpload="true"
-                                                  numberOfAttachmentsText="{i18n>attachment}"
-                                                  uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments" 
-                                                  change="onFileChange" uploadComplete="onFileUploadComplete" 
-                                                  beforeUploadStarts="onFileBeforeUpload" fileDeleted="onFileDeleted" 
-                                                  />
+                                <!--component to upload files FilesSet-->
+                                <UploadCollection id="fileUpload" maximumFilenameLength="55" maximumFileSize="10" multiple="true" sameFilenameAllowed="true" instantUpload="true" numberOfAttachmentsText="{i18n>attachment}" uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments" change="onFileChange" uploadComplete="onFileUploadComplete" beforeUploadStarts="onFileBeforeUpload" fileDeleted="onFileDeleted" />
                             </Panel>
-
-                                <!--
-                                <Label text="Cover photo"/>
-                                <u:FileUploader width="100%" tooltip="Upload product cover photo to the local server" style="Emphasized" placeholder="Choose a file for Upload..."/>
-                                <Label text="Manufacturing date"/>
-                                <DatePicker id="DP3" displayFormat="short" value="{/manufacturingDate}"/>
-                                <Label text="Availability"/>
-                                <SegmentedButton selectedKey="{/availabilityType}">
-                                    <items>
-                                        <SegmentedButtonItem key="In store" text="In store"/>
-                                        <SegmentedButtonItem key="In depot" text="In depot"/>
-                                        <SegmentedButtonItem key="In repository" text="In repository"/>
-                                        <SegmentedButtonItem key="Out of stock" text="Out of stock"/>
-                                    </items>
-                                </SegmentedButton>
-                                <Label text="Size"/>
-                                <Input value="{/size}"/>
-                                <ComboBox maxWidth="100px" selectedKey="{/measurement}">
-                                    <core:Item key="X" text="X"/>
-                                    <core:Item key="Y" text="Y"/>
-                                    <core:Item key="Z" text="Z"/>
-                                </ComboBox>-->
-
-
                         </WizardStep>
-                        <!--
-							<WizardStep id="PricingStep" activate="pricingActivate" complete="pricingComplete" validated="true" title="Pricing">
-								<MessageStrip class="sapUiSmallMarginBottom" text="You can use the wizard previousStep() and nextStep() methods to navigate from step to step without validation. Also you can use the GoToStep(step) method to scroll programmatically to previously visited steps." showIcon="true"/> <form:SimpleForm editable="true">
-									<Label text="Price"/>
-									<Input value="{/productPrice}"/>
-									<Label text="Discount group"/>
-									<ComboBox selectedKey="{/discountGroup}">
-										<core:Item key="Kids" text="Kids"/>
-										<core:Item key="Teens" text="Teens"/>
-										<core:Item key="Adults" text="Adults"/>
-										<core:Item key="Elderly" text="Elderly"/>
-									</ComboBox>
-									<Label text=" VAT is included"/>
-									<CheckBox selected="{/productVAT}"/>
-								</form:SimpleForm>
-							</WizardStep>-->
                     </Wizard>
                 </content>
                 <footer>
@@ -146,7 +88,7 @@
                     <form:SimpleForm title="1. {i18n>employeeType}" minWidth="1024" editable="false" layout="ResponsiveGridLayout">
                         <form:content>
                             <Label text="{i18n>type}"/>
-                            <Text  text="{= ${/EmployeeType}==='0' ? ${i18n>intern} : ${/EmployeeType}==='1' ? ${i18n>freelance} : ${/EmployeeType}==='2' ? ${i18n>manager} : ''}"/>
+                            <Text text="{= ${/EmployeeType}==='0' ? ${i18n>intern} : ${/EmployeeType}==='1' ? ${i18n>freelance} : ${/EmployeeType}==='2' ? ${i18n>manager} : ''}"/>
 
                             <Link press="editStepOne" text="Edit" />
                         </form:content>
@@ -161,7 +103,7 @@
                             <Label text="{i18n>lastName}"/>
                             <Text text="{/LastName}"/>
 
-                            <Label text="{i18n>dni}"/>
+                            <Label text="{i18n>dni}" />
                             <Text text="{/Dni}"/>
 
                             <Label text="{i18n>cif}"/>
