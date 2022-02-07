@@ -25,28 +25,25 @@
                         </WizardStep>
 
                         <!--step 2: Employee Data Form-->
-                        <WizardStep id="EmployeeDataStep" title="{i18n>employeeData}" nextStep="AdditionalDataStep">
+                        <WizardStep id="EmployeeDataStep" title="{i18n>employeeData}" validated="false" activate="employeeDataValidation" nextStep="AdditionalDataStep">
                             <!-- validated="false" activate="additionalInfoValidation">-->
                             <MessageStrip class="sapUiSmallMarginBottom" text="{i18n>msgEmplData}" showIcon="true"/>
                             <form:SimpleForm editable="true">
 
                                 <Label text="{i18n>firstName}" required="true"/>
-                                <Input value="{/FirstName}" valueLiveUpdate="true"/>
+                                <Input id="i_FirstName" value="{/FirstName}" valueState="{/firstNameState}" change="employeeDataValidation"/>
 
                                 <Label text="{i18n>lastName}" required="true"/>
-                                <Input value="{/LastName}" valueLiveUpdate="true"/>
+                                <Input id="i_LastName" value="{/LastName}" valueState="{/lastNameState}" change="employeeDataValidation"/>
 
                                 <Label text="{jsonModelConfig>/dniLabel}" required="true"/>
-                                <Input value="{/Dni}" valueLiveUpdate="true"/>
+                                <Input id="i_Dni" value="{/Dni}" valueState="{/dniState}" change="employeeDataValidation"/>
 
                                 <!-- <Label text="{i18n>cif}" required="true"/>
                                 <Input value="{/Dni}" valueLiveUpdate="true"/> -->
 
                                 <Label text="{jsonModelConfig>/salaryLabel}"/>
-                                <Slider enableTickmarks="true" class="sapUiSmallMarginBottom" 
-                                        min="{jsonModelConfig>/salaryMin}" 
-                                        max="{jsonModelConfig>/salaryMax}" 
-                                        value="{jsonModelConfig>/salaryValue}" width="auto" progress="true" step="{jsonModelConfig>/salaryStep}"/>
+                                <Slider id="i_Salary" enableTickmarks="true" class="sapUiSmallMarginBottom" min="{jsonModelConfig>/salaryMin}" max="{jsonModelConfig>/salaryMax}" value="{/Salary}" width="auto" progress="true" step="{jsonModelConfig>/salaryStep}"/>
 
                                 <!-- <Label text="{i18n>dailyPrice}"/>
                                 <Slider enableTickmarks="true" class="sapUiSmallMarginBottom" min="100" max="2000" value="400" step="100" width="80%" />
@@ -55,7 +52,7 @@
                                 <Slider enableTickmarks="true" class="sapUiSmallMarginBottom" min="12000" max="80000" value="24000" step="2000" /> -->
 
                                 <Label text="{i18n>creationDate}" required="true"/>
-                                <DatePicker value="{/CreationDate}"/>
+                                <DatePicker id="i_CreationDate" value="{/CreationDate}" valueState="{/creationDateState}" change="employeeDataValidation" />
                             </form:SimpleForm>
                         </WizardStep>
 
@@ -103,20 +100,15 @@
                             <Label text="{i18n>lastName}"/>
                             <Text text="{/LastName}"/>
 
-                            <Label text="{i18n>dni}" />
+                            <Label text="{jsonModelConfig>/dniLabel}" />
                             <Text text="{/Dni}"/>
 
-                            <Label text="{i18n>cif}"/>
-                            <Text text="{/Dni}"/>
-
-                            <Label text="{i18n>annualSalary}"/>
-                            <Text text="{/Salary}"/>
-
-                            <Label text="{i18n>dailyPrice}"/>
+                            <Label text="{jsonModelConfig>/salaryLabel}"/>
                             <Text text="{/Salary}"/>
 
                             <Label text="{i18n>creationDate}"/>
-                            <Text text="{/CreationDate}"/>
+                            <Text text="{path : '/CreationDate',
+                                         formatOptions: { source: {pattern: 'dd MMM. yyyy'}}}"/>
 
                             <Link press="editStepTwo" text="Edit" />
                         </form:content>
@@ -129,6 +121,7 @@
                             <Label text="{i18n>comments}"/>
                             <Text text="{/Comments}"/>
                             <Label text="{i18n>documents}"/>
+                            <Text text="{/Comments}"/>
 
                             <Link press="editStepThree" text="Edit" />
                         </form:content>

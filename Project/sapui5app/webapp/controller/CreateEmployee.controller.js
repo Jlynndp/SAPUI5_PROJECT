@@ -35,19 +35,13 @@ sap.ui.define([
             this.getView().setModel(oJSONModelConfig, "jsonModelConfig");
         },
 
-        // setProductType: function (oEvent) {
-        // 	var productType = oEvent.getSource().getTitle();
-        // 	this.model.setProperty("/productType", productType);
-        // 	this.byId("ProductStepChosenType").setText("Chosen product type: " + productType);
-        // 	this._wizard.validateStep(this.byId("ProductTypeStep"));
-        // },
-
         setEmployeeType: function (oEvent) {
 
             var employeeType = oEvent.getParameters().item.getKey();
             var currentStep = this.byId("EmployeeTypeStep");
-
-            // let oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
+            // get view models
+            var oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
+            var oJSONModelConfig = this.getView().getModel("jsonModelConfig");
 
             //set selected employee type
             this.model.setProperty("/EmployeeType", employeeType);
@@ -60,13 +54,7 @@ sap.ui.define([
             //validate current step and activate next step
             this._wizard.validateStep(currentStep);
 
-
-            // //set properties of next step
-            let oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
-            //var employeeType = this.model.getProperty("/EmployeeType");
-            //set properties of next step
-            var oJSONModelConfig = this.getView().getModel("jsonModelConfig");
-
+            //set properties for next step
             switch (employeeType) {
                 case "0":
                     oJSONModelConfig.setProperty("/dniLabel", oResourceBundle.getText("dni"));
@@ -74,8 +62,8 @@ sap.ui.define([
 
                     oJSONModelConfig.setProperty("/salaryMin", 12000);
                     oJSONModelConfig.setProperty("/salaryMax", 80000);
-                    oJSONModelConfig.setProperty("/salaryValue", 24000);
                     oJSONModelConfig.setProperty("/salaryStep", 10000);
+                    this.model.setProperty("/Salary", 24000);
                     break;
 
                 case "1":
@@ -84,8 +72,8 @@ sap.ui.define([
 
                     oJSONModelConfig.setProperty("/salaryMin", 100);
                     oJSONModelConfig.setProperty("/salaryMax", 2000);
-                    oJSONModelConfig.setProperty("/salaryValue", 400);
                     oJSONModelConfig.setProperty("/salaryStep", 150);
+                    this.model.setProperty("/Salary", 400);
                     break;
 
                 case "2":
@@ -94,8 +82,8 @@ sap.ui.define([
 
                     oJSONModelConfig.setProperty("/salaryMin", 50000);
                     oJSONModelConfig.setProperty("/salaryMax", 200000);
-                    oJSONModelConfig.setProperty("/salaryValue", 70000);
                     oJSONModelConfig.setProperty("/salaryStep", 20000);
+                    this.model.setProperty("/Salary", 70000);
                     break;
             }
 
@@ -136,6 +124,109 @@ sap.ui.define([
             // history["prevEmployeeTypeSelect"] = this.model.getProperty("/EmployeeType");
             //}
         },
+
+
+        employeeDataValidation: function (oEvent) {
+            var firstName = this.byId("i_FirstName").getValue();
+            var lastName = this.byId("i_LastName").getValue();
+            var dni = this.byId("i_Dni").getValue();
+            var creationDate = this.byId("i_CreationDate").getValue();
+
+
+            if (!firstName) {
+                this.model.setProperty("/firstNameState", "Error");
+            } else {
+                this.model.setProperty("/firstNameState", "None");
+            }
+
+            if (!lastName) {
+                this.model.setProperty("/lastNameState", "Error");
+            } else {
+                this.model.setProperty("/lastNameState", "None");
+            }
+
+            if (!dni) {
+                this.model.setProperty("/dniState", "Error");
+            } else {
+                this.onChangeDni(dni);
+            }
+
+            if (!creationDate) {
+                this.model.setProperty("/creationDateState", "Error");
+            } else {
+                this.onChangeCreationDate(creationDate);
+            }
+
+            if (this.model.getProperty("/firstNameState") === "None" &&
+                this.model.getProperty("/lastNameState") === "None" &&
+                this.model.getProperty("/dniState") === "None" &&
+                this.model.getProperty("/creationDateState") === "None") {
+
+                this._wizard.validateStep(this.byId("EmployeeDataStep"));
+            } else {
+                this._wizard.invalidateStep(this.byId("EmployeeDataStep"));
+            }
+        },
+
+        //check first name
+        onChangeFirstName: function (oEvent) {
+            if (!oEvent.getParameter("value")) {
+                this.model.setProperty("/firstNameState", "Error");
+            } else {
+                this.model.setProperty("/firstNameState", "None");
+                // this.employeeDataValidation();
+            }
+        },
+
+        //check last name
+        onChangeLastName: function (oEvent) {
+            if (!oEvent.getParameter("value")) {
+                this.model.setProperty("/lastNameState", "Error");
+            } else {
+                this.model.setProperty("/lastNameState", "None");
+                // this.employeeDataValidation();
+            }
+        },
+
+
+        onChangeDni: function (dni) {
+            //var dni = oEvent.getParameter("value");
+            var number;
+            var letter;
+            var letterList;
+            var regularExp = /^\d{8}[a-zA-Z]$/;
+            //Se comprueba que el formato es válido
+            if (regularExp.test(dni) === true) {
+                //Número
+                number = dni.substr(0, dni.length - 1);
+                //Letra
+                letter = dni.substr(dni.length - 1, 1);
+                number = number % 23;
+                letterList = "TRWAGMYFPDXBNJZSQVHLCKET";
+                letterList = letterList.substring(number, number + 1);
+                if (letterList !== letter.toUpperCase()) {
+                    //Error
+                    this.model.setProperty("/dniState", "Error");
+                } else {
+                    //Correcto
+                    this.model.setProperty("/dniState", "None");
+                }
+            } else {
+                //Error
+                this.model.setProperty("/dniState", "Error");
+            }
+        },
+
+        onChangeCreationDate: function (date) {
+            //var date = oEvent.getParameter("value");
+            let d = new Date(date);
+            if (d.toString() === 'Invalid Date') {
+                this.model.setProperty("/creationDateState", "Error");
+            } else {
+                this.model.setProperty("/creationDateState", "None");
+            }
+        },
+
 
         goToDataStep: function () {
             //var selectedKey = this.model.getProperty("/EmployeeType");
@@ -189,28 +280,7 @@ sap.ui.define([
 
         },
 
-        // additionalInfoValidation: function () {
-        // 	var name = this.byId("ProductName").getValue();
-        // 	var weight = parseInt(this.byId("ProductWeight").getValue());
 
-        // 	if (isNaN(weight)) {
-        // 		this.model.setProperty("/productWeightState", "Error");
-        // 	} else {
-        // 		this.model.setProperty("/productWeightState", "None");
-        // 	}
-
-        // 	if (name.length < 6) {
-        // 		this.model.setProperty("/productNameState", "Error");
-        // 	} else {
-        // 		this.model.setProperty("/productNameState", "None");
-        // 	}
-
-        // 	if (name.length < 6 || isNaN(weight)) {
-        // 		this._wizard.invalidateStep(this.byId("ProductInfoStep"));
-        // 	} else {
-        // 		this._wizard.validateStep(this.byId("ProductInfoStep"));
-        // 	}
-        // },
 
         // optionalStepActivation: function () {
         // 	MessageToast.show(
@@ -283,15 +353,15 @@ sap.ui.define([
         },
 
         _handleMessageBoxOpen: function (sMessage, sMessageBoxType) {
-        	MessageBox[sMessageBoxType](sMessage, {
-        		actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-        		onClose: function (oAction) {
-        			if (oAction === MessageBox.Action.YES) {
-        				this._handleNavigationToStep(0);
-        				this._wizard.discardProgress(this._wizard.getSteps()[0]);
-        			}
-        		}.bind(this)
-        	});
+            MessageBox[sMessageBoxType](sMessage, {
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                onClose: function (oAction) {
+                    if (oAction === MessageBox.Action.YES) {
+                        this._handleNavigationToStep(0);
+                        this._wizard.discardProgress(this._wizard.getSteps()[0]);
+                    }
+                }.bind(this)
+            });
         },
 
         // _setEmptyValue: function (sPath) {
@@ -308,14 +378,8 @@ sap.ui.define([
             this._handleMessageBoxOpen("Are you sure you want to submit your report?", "confirm");
 
             //submit Employee: “/sap/opu/odata/sap/ZEMPLOYEES_SRV/Users”
-
             //upload attachments: “/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments”
-
         },
-
-        // productWeighStateFormatter: function (val) {
-        // 	return isNaN(val) ? "Error" : "None";
-        // },
 
         discardProgress: function () {
             this._wizard.discardProgress(this.byId("EmployeeTypeStep"));
@@ -331,10 +395,64 @@ sap.ui.define([
                     }
                 }
             };
-
-            // this.model.setProperty("/productWeightState", "Error");
-            // this.model.setProperty("/productNameState", "Error");
             clearContent(this._wizard.getSteps());
-        }
+        },
+
+
+        // //UPLOAD FILE FUNCTIONS
+        // //upload file executes Post method with slug and csrf-token parameters
+        // onFileBeforeUpload: function (oEvent) {
+        //     let fileName = oEvent.getParameter("fileName");
+        //     let objectContext = oEvent.getSource().getBindingContext("employeeModel").getObject();
+
+        //     //slug: header parameter allow send key values for the file
+        //     let oCustomerHeaderSlug = new sap.m.UploadCollectionParameter({
+        //         name: "slug",
+        //         value: objectContext.OrderID + ";" + this.getOwnerComponent().SapId + ";" + objectContext.EmployeeID + ";" + fileName
+        //     });
+
+        //     //add slug parameter to previous parameters of the media object
+        //     oEvent.getParameters().addHeaderParameter(oCustomerHeaderSlug);
+        // },
+
+        // //update token every time files change
+        // onFileChange: function (oEvent) {
+        //     //add csrf-token parameter
+        //     let oUploadCollection = oEvent.getSource();
+        //     let oCustomerHeaderToken = new sap.m.UploadCollectionParameter({
+        //         name: "x-csrf-token",
+        //         value: this.getView().getModel("employeeModel").getSecurityToken()
+        //     });
+        //     oUploadCollection.addHeaderParameter(oCustomerHeaderToken);
+        // },
+
+        // //update collection after a new file has been uploaded
+        // onFileUploadComplete: function (oEvent) {
+        //     oEvent.getSource().getBinding("items").refresh();
+        // },
+
+
+        // //delete files in sap-system
+        // onFileDeleted: function (oEvent) {
+        //     var oUploadCollection = oEvent.getSource();
+
+        //     //route to be deleted
+        //     var sPath = oEvent.getParameter("item").getBindingContext("employeeModel").getPath();
+        //     this.getView().getModel("employeeModel").remove(sPath, {
+        //         success: function () {
+        //             oUploadCollection.getBinding("items").refresh();
+        //         },
+        //         error: function () {
+        //         }
+        //     });
+        // },
+
+        // //call file with /$value, using window methods
+        // downloadFile: function (oEvent) {
+        //     const sPath = oEvent.getSource().getBindingContext("incidenceModel").getPath();
+        //     window.open("/sap/opu/odata/sap/YSAPUI5_SRV_01" + sPath + "/$value");
+        // }
+
+
     });
 });
