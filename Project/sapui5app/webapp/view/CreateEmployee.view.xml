@@ -8,13 +8,14 @@
         <pages>
             <Page id="wizardContentPage" showHeader="false">
                 <content>
-                    <Wizard id="CreateEmployeeWizard" class="sapUiResponsivePadding--header sapUiResponsivePadding--content" complete="onWizardCompleted" finishButtonText="{i18n>btnReview}" enableBranching="true" showNextButton="true">
+                    <Wizard id="CreateEmployeeWizard" class="sapUiResponsivePadding--header sapUiResponsivePadding--content" complete="onWizardCompleted" 
+                            finishButtonText="{i18n>btnReview}" enableBranching="true" showNextButton="true">
 
                         <!--step 1: Employee Type selection-->
                         <WizardStep id="EmployeeTypeStep" title="{i18n>employeeType}" validated="false" nextStep="EmployeeDataStep" complete="goToDataStep">
                             <MessageStrip class="sapUiSmallMarginBottom" text="{i18n>msgEmplType}" showIcon="true"/>
                             <HBox alignItems="Center" justifyContent="Center" width="100%">
-                                <SegmentedButton width="320px" selectionChange="setEmployeeType" selectedKey="/EmployeeType" selectedItem="">
+                                <SegmentedButton width="320px" selectionChange="setEmployeeType" selectedKey="{employeeModel>/Type}" selectedItem="">
                                     <items>
                                         <SegmentedButtonItem text="{i18n>intern}" key="0"/>
                                         <SegmentedButtonItem text="{i18n>freelance}" key="1"/>
@@ -31,19 +32,20 @@
                             <form:SimpleForm editable="true">
 
                                 <Label text="{i18n>firstName}" required="true"/>
-                                <Input id="i_FirstName" value="{/FirstName}" valueState="{/firstNameState}" change="employeeDataValidation"/>
+                                <Input id="i_FirstName" value="{employeeModel>/FirstName}" valueState="{employeeModel>/firstNameState}" liveChange="employeeDataValidation"/>
 
                                 <Label text="{i18n>lastName}" required="true"/>
-                                <Input id="i_LastName" value="{/LastName}" valueState="{/lastNameState}" change="employeeDataValidation"/>
+                                <Input id="i_LastName" value="{employeeModel>/LastName}" valueState="{employeeModel>/lastNameState}" liveChange="employeeDataValidation"/>
 
                                 <Label text="{jsonModelConfig>/dniLabel}" required="true"/>
-                                <Input id="i_Dni" value="{/Dni}" valueState="{/dniState}" change="employeeDataValidation"/>
+                                <Input id="i_Dni" value="{employeeModel>/Dni}" valueState="{employeeModel>/dniState}" liveChange="employeeDataValidation"/>
 
                                 <!-- <Label text="{i18n>cif}" required="true"/>
                                 <Input value="{/Dni}" valueLiveUpdate="true"/> -->
 
                                 <Label text="{jsonModelConfig>/salaryLabel}"/>
-                                <Slider id="i_Salary" enableTickmarks="true" class="sapUiSmallMarginBottom" min="{jsonModelConfig>/salaryMin}" max="{jsonModelConfig>/salaryMax}" value="{/Salary}" width="auto" progress="true" step="{jsonModelConfig>/salaryStep}"/>
+                                <Slider id="i_Salary" enableTickmarks="true" class="sapUiSmallMarginBottom" min="{jsonModelConfig>/salaryMin}" max="{jsonModelConfig>/salaryMax}" 
+                                        value="{employeeModel>/Salary}" width="auto" progress="true" step="{jsonModelConfig>/salaryStep}"/>
 
                                 <!-- <Label text="{i18n>dailyPrice}"/>
                                 <Slider enableTickmarks="true" class="sapUiSmallMarginBottom" min="100" max="2000" value="400" step="100" width="80%" />
@@ -52,7 +54,7 @@
                                 <Slider enableTickmarks="true" class="sapUiSmallMarginBottom" min="12000" max="80000" value="24000" step="2000" /> -->
 
                                 <Label text="{i18n>creationDate}" required="true"/>
-                                <DatePicker id="i_CreationDate" value="{/CreationDate}" valueState="{/creationDateState}" change="employeeDataValidation" />
+                                <DatePicker id="i_CreationDate" value="{employeeModel>/CreationDate}" valueState="{employeeModel>/creationDateState}" change="onChangeCreationDate"/>
                             </form:SimpleForm>
                         </WizardStep>
 
@@ -62,12 +64,14 @@
                             <!-- <form:SimpleForm editable="true"> -->
 
                             <Label text="{i18n>comments}"/>
-                            <TextArea id="TextArea" cols="200" height="100px" value="{/Comments}"/>
+                            <TextArea id="TextArea" cols="200" height="100px" value="{employeeModel>/Comments}"/>
                             <!-- </form:SimpleForm> -->
 
                             <Panel>
                                 <!--component to upload files FilesSet-->
-                                <UploadCollection id="fileUpload" maximumFilenameLength="55" maximumFileSize="10" multiple="true" sameFilenameAllowed="true" instantUpload="true" numberOfAttachmentsText="{i18n>attachment}" uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments" change="onFileChange" uploadComplete="onFileUploadComplete" beforeUploadStarts="onFileBeforeUpload" fileDeleted="onFileDeleted" />
+                                <UploadCollection id="fileUpload" maximumFilenameLength="55" maximumFileSize="10" multiple="true" sameFilenameAllowed="true" 
+                                                  instantUpload="true" numberOfAttachmentsText="{i18n>attachment}" uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments" 
+                                                  change="onFileChange" uploadComplete="onFileUploadComplete" beforeUploadStarts="onFileBeforeUpload" fileDeleted="onFileDeleted" />
                             </Panel>
                         </WizardStep>
                     </Wizard>
@@ -85,7 +89,7 @@
                     <form:SimpleForm title="1. {i18n>employeeType}" minWidth="1024" editable="false" layout="ResponsiveGridLayout">
                         <form:content>
                             <Label text="{i18n>type}"/>
-                            <Text text="{= ${/EmployeeType}==='0' ? ${i18n>intern} : ${/EmployeeType}==='1' ? ${i18n>freelance} : ${/EmployeeType}==='2' ? ${i18n>manager} : ''}"/>
+                            <Text text="{= ${employeeModel>/Type}==='0' ? ${i18n>intern} : ${employeeModel>/Type}==='1' ? ${i18n>freelance} : ${employeeModel>/Type}==='2' ? ${i18n>manager} : ''}"/>
 
                             <Link press="editStepOne" text="Edit" />
                         </form:content>
@@ -95,20 +99,24 @@
                     <form:SimpleForm title="2. {i18n>employeeData}" minWidth="1024" editable="false" layout="ResponsiveGridLayout">
                         <form:content>
                             <Label text="{i18n>firstName}"/>
-                            <Text text="{/FirstName}"/>
+                            <Text text="{employeeModel>/FirstName}"/>
 
                             <Label text="{i18n>lastName}"/>
-                            <Text text="{/LastName}"/>
+                            <Text text="{employeeModel>/LastName}"/>
 
                             <Label text="{jsonModelConfig>/dniLabel}" />
-                            <Text text="{/Dni}"/>
+                            <Text text="{employeeModel>/Dni}"/>
 
                             <Label text="{jsonModelConfig>/salaryLabel}"/>
-                            <Text text="{/Salary}"/>
+                            <Text text="{employeeModel>/Salary}"/>
 
                             <Label text="{i18n>creationDate}"/>
-                            <Text text="{path : '/CreationDate',
-                                         formatOptions: { source: {pattern: 'dd MMM. yyyy'}}}"/>
+                            <Text text="{path: 'employeeModel>/CreationDate',
+                                         type: 'sap.ui.model.type.Date',
+                                         formatOptions: {
+                                             source: { pattern: 'dd-MM-yyyy' },
+                                             style: 'medium'}}" />
+
 
                             <Link press="editStepTwo" text="Edit" />
                         </form:content>
@@ -119,9 +127,9 @@
                         <form:content>
 
                             <Label text="{i18n>comments}"/>
-                            <Text text="{/Comments}"/>
+                            <Text text="{employeeModel>/Comments}"/>
                             <Label text="{i18n>documents}"/>
-                            <Text text="{/Comments}"/>
+                            <Text text="{employeeModel>/Comments}"/>
 
                             <Link press="editStepThree" text="Edit" />
                         </form:content>

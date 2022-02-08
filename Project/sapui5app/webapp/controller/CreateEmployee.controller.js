@@ -12,16 +12,11 @@ sap.ui.define([
 
     return Controller.extend("logaligroup.sapui5app.controller.CreateEmployee", {
         onInit: function () {
+            this._bus = sap.ui.getCore().getEventBus();
+
             this._wizard = this.byId("CreateEmployeeWizard");
             this._oNavContainer = this.byId("wizardNavContainer");
             this._oWizardContentPage = this.byId("wizardContentPage");
-
-            this.model = new JSONModel();
-            // // this.model.setData({
-            // // 	productNameState: "Error",
-            // // 	productWeightState: "Error"
-            // // });
-            this.getView().setModel(this.model);
 
             //config data view properties
             var oJSONModelConfig = new sap.ui.model.json.JSONModel({
@@ -33,18 +28,32 @@ sap.ui.define([
                 salaryStep: 0,
             });
             this.getView().setModel(oJSONModelConfig, "jsonModelConfig");
+
+            this.model = new sap.ui.model.json.JSONModel([]);
+            this.getView().setModel( this.model, "employeeModel" );
+
+            // var oData = employeeModel.getData();
+            // var index = oData.length;
+            // oData.push({ index : index + 1});
+            // employeeModel.refresh();
+            // newEmployee.bindElement("employeeModel>/" + index);
         },
 
         setEmployeeType: function (oEvent) {
 
             var employeeType = oEvent.getParameters().item.getKey();
             var currentStep = this.byId("EmployeeTypeStep");
+
             // get view models
             var oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
             var oJSONModelConfig = this.getView().getModel("jsonModelConfig");
+            //var employeeModel = oEvent.getSource().getParent().getModel("employeeModel");
+
+            //let context = oEvent.getSource().getBindingContext("employeeModel");
+            //let contextObj = context.getObject();
 
             //set selected employee type
-            this.model.setProperty("/EmployeeType", employeeType);
+            //this.model.setProperty("/Type", employeeType);
 
             //validate if EmployeeType has changed, discard progress
             if (this._wizard.getProgressStep() !== currentStep) {
@@ -63,6 +72,8 @@ sap.ui.define([
                     oJSONModelConfig.setProperty("/salaryMin", 12000);
                     oJSONModelConfig.setProperty("/salaryMax", 80000);
                     oJSONModelConfig.setProperty("/salaryStep", 10000);
+
+                    //contextObj.Salary = 24000;
                     this.model.setProperty("/Salary", 24000);
                     break;
 
@@ -86,7 +97,6 @@ sap.ui.define([
                     this.model.setProperty("/Salary", 70000);
                     break;
             }
-
 
             // oJSONModelConfig.setProperty("/ salaryMin", true);
             // oJSONModelConfig.setProperty("/salaryMax", true);
@@ -126,11 +136,11 @@ sap.ui.define([
         },
 
 
-        employeeDataValidation: function (oEvent) {
+        employeeDataValidation: function () {
             var firstName = this.byId("i_FirstName").getValue();
             var lastName = this.byId("i_LastName").getValue();
             var dni = this.byId("i_Dni").getValue();
-            var creationDate = this.byId("i_CreationDate").getValue();
+            //var creationDate = this.byId("i_CreationDate").getValue();
 
 
             if (!firstName) {
@@ -151,11 +161,11 @@ sap.ui.define([
                 this.onChangeDni(dni);
             }
 
-            if (!creationDate) {
-                this.model.setProperty("/creationDateState", "Error");
-            } else {
-                this.onChangeCreationDate(creationDate);
-            }
+            //if (!creationDate) {
+            //     this.model.setProperty("/creationDateState", "Error");
+            // } else {
+            //     this.onChangeCreationDate(creationDate);
+            // }
 
             if (this.model.getProperty("/firstNameState") === "None" &&
                 this.model.getProperty("/lastNameState") === "None" &&
@@ -217,13 +227,19 @@ sap.ui.define([
             }
         },
 
-        onChangeCreationDate: function (date) {
-            //var date = oEvent.getParameter("value");
-            let d = new Date(date);
-            if (d.toString() === 'Invalid Date') {
+        onChangeCreationDate: function (oEvent) {
+            // var date = oEvent.getParameter("value");
+            // let d = new Date(date);
+            // if (d.toString() === 'Invalid Date') {
+            if (!oEvent.getSource().isValidValue()) {
+                oEvent.getSource().setValueState('Error');
                 this.model.setProperty("/creationDateState", "Error");
+                this._wizard.invalidateStep(this.byId("EmployeeDataStep"));
             } else {
-                this.model.setProperty("/creationDateState", "None");
+                oEvent.getSource().setValueState('None');
+                //this.model.setProperty("/creationDateState", "None");
+                this._wizard.validateStep(this.byId("EmployeeDataStep"));
+                //this.employeeDataValidation();
             }
         },
 
@@ -374,11 +390,47 @@ sap.ui.define([
             //back to Menu
         },
 
-        onWizardSubmit: function () {
+        onWizardSubmit: function (oEvent) {
             this._handleMessageBoxOpen("Are you sure you want to submit your report?", "confirm");
 
             //submit Employee: “/sap/opu/odata/sap/ZEMPLOYEES_SRV/Users”
+            var oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
+
+            //get ID for selected employee: model/object/property
+            var employeeId = this.getView().getModel("employeeModel").getData().EmployeeId;
+
+            //get employee
+            var employeeModel = this.getView().getModel("employeeModel").getData();
+
+            if (typeof EmployeeId == 'undefined') {
+                //build create operation body
+                var body = {
+                    SapId: this.getOwnerComponent().SapId,
+                    Type: employeeModel.Type,
+                    FirstName: employeeModel.FirstName,
+                    LastName: employeeModel.LastName,
+                    Dni: employeeModel.Dni,
+                    CreationDate: employeeModel.CreationDate,
+                    Comments: employeeModel.Comments,
+                };
+
+                // //save new employee: get view/model/create_operation
+                // this.getView().getModel("employeeModel").create("/Users", body, {
+                //     success: function () {
+                //         this.onReadDataEmployee.bind(this)(employeeId);
+                //         //sap.m.MessageToast.show(oResourceBundle.getText("oDataSaveOK"));
+                //         sap.m.MessageBox.success(oResourceBundle.getText("oDataSaveOK"));
+                //     }.bind(this),
+                //     error: function (e) {
+                //         sap.m.MessageToast.show(oResourceBundle.getText("oDataSaveKO"));
+                //     }.bind(this)
+                // })
+            };
+
+
+            
             //upload attachments: “/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments”
+            //EmployeeId: employeeId.toString(),
         },
 
         discardProgress: function () {
