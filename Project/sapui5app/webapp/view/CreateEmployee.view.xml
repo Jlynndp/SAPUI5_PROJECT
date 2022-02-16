@@ -63,7 +63,7 @@
 
                             <Panel>
                                 <!--component to upload files FilesSet-->
-                                <UploadCollection id="fileUpload" 
+                                <UploadCollection id="UploadCollection"
                                                   maximumFilenameLength="55" 
                                                   maximumFileSize="10" 
                                                   multiple="true" 
@@ -132,9 +132,17 @@
                             <Label text="{i18n>comments}"/>
                             <Text text="{/Comments}"/>
                             <Label text="{i18n>documents}"/>
-                            <Text text=""/>
 
+                            <Text text="{/_filesNum} {i18n>files}" visible="{/_filesVisible}" />
+                            <Label/>
+                            <List items="{/Attachments}" visible="{/_filesVisible}" >
+                                <items>
+                                    <StandardListItem title="{DocName}"/>
+                                </items>
+                            </List>
                             <Link press="editStepThree" text="Edit" />
+
+
                         </form:content>
                     </form:SimpleForm>
 

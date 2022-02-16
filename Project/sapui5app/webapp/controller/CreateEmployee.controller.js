@@ -32,6 +32,8 @@ sap.ui.define([
             });
             this.getView().setModel(oJSONModelConfig, "jsonModelConfig");
 
+            //read data
+
             // var oData = employeeModel.getData();
             // var index = oData.length;
             // oData.push({ index : index + 1});
@@ -59,8 +61,23 @@ sap.ui.define([
         //     this.getView().setModel(oJSONModelConfig, "jsonModelConfig");
         // },
 
-        setEmployeeType: function (oEvent) {
 
+        // //read Employee Entity from oData to get last employeeId
+        // onReadODataEmployee: function(){
+        //     this.getView().getModel("employeeModel").read("/User", {
+        //         filters: [
+        //             new sap.ui.model.Filter("SapId", "EQ", this.getOwnerComponent().SapId)
+        //         ],
+        //         success: function(data){
+        //             var employeeModel = this._model;
+        //                 employeeModel.setData(data.results);
+        //         }.bind(this),
+        //         error: function() {
+        //         }.bind(this)
+        //     })
+        // },
+
+        setEmployeeType: function (oEvent) {
             var employeeType = oEvent.getParameters().item.getKey();
             var currentStep = this.byId("EmployeeTypeStep");
 
@@ -312,6 +329,28 @@ sap.ui.define([
         // },
 
         onWizardCompleted: function () {
+            //get files
+            var files = this.byId("UploadCollection").getItems();
+
+            if (files.length > 0) {
+                this._model.setProperty("/_filesNum", files.length);
+                this._model.setProperty("/_filesVisible", true);
+
+                var attachments = [];
+                for (var i in files) {
+                    attachments[i] = {
+                        DocName: files[i].getFileName(),
+                        MimeType: files[i].getMimeType()
+                    };
+                };
+                if (attachments) {
+                    this._model.setProperty("/Attachments", attachments);
+                };
+            } else {
+                this._model.setProperty("/_filesVisible", false);
+            }
+            
+            //go to Review Page
             this._oNavContainer.to(this.byId("wizardReviewPage"));
         },
 
@@ -381,11 +420,11 @@ sap.ui.define([
             var employeeModel = this.getView().getModel().getData();
 
             const date = new Date(employeeModel.CreationDate);
-            const creationDate = date.toJSON().slice(0,19);
+            const creationDate = date.toJSON().slice(0, 19);
 
             if (typeof employeeId == 'undefined') {
                 //build create operation body
-                var body = {
+                var body_user = {
                     SapId: this.getOwnerComponent().SapId,
                     Type: employeeModel.Type,
                     FirstName: employeeModel.FirstName,
@@ -393,23 +432,44 @@ sap.ui.define([
                     Dni: employeeModel.Dni,
                     CreationDate: creationDate,
                     Comments: employeeModel.Comments,
+                    UserToSalary: [{
+                        Amount: parseFloat(employeeModel.Salary).toString(),
+                        Comments: employeeModel.Comments,
+                        Waers: "EUR"
+                    }]
                 };
 
                 //save new employee: get view/model/create_operation
-                this.getView().getModel("employeeModel").create("/Users", body, {
-                    success: function () {
+                this.getView().getModel("employeeModel").create("/Users", body_user, {
+                    success: function (data) {
                         //this.onReadDataEmployee.bind(this)(employeeId);
                         //sap.m.MessageToast.show(oResourceBundle.getText("oDataSaveOK"));
+                        employeeId = data.EmployeeId;
+                        this._model.setProperty("/EmployeeId", data.EmployeeId);
+
+                        // //header parameter: x-csrf-token
+                        // this.onFileChange(oEvent);
+                        // //slug parameter: SapId; EmployeeId; FileName
+                        // this.onFileBeforeUpload(oEvent);
+                        let uploadCollection = this.byId("UploadCollection");
+                        if ( uploadCollection.getItems().length > 0 ) {
+                            
+                            uploadCollection.upload();
+                        };
+
+                        //upload attachments: “/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments”
                         sap.m.MessageBox.success(oResourceBundle.getText("oDataSaveOK"));
+
+
                     }.bind(this),
                     error: function (e) {
                         sap.m.MessageToast.show(oResourceBundle.getText("oDataSaveKO"));
                     }.bind(this)
-                })
+                });
             };
 
-            //upload attachments: “/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments”
-            //EmployeeId: employeeId.toString(),
+
+
         },
 
         discardProgress: function () {
@@ -434,16 +494,16 @@ sap.ui.define([
         //upload file executes Post method with slug and csrf-token parameters
         onFileBeforeUpload: function (oEvent) {
             var fileName = oEvent.getParameter("fileName");
-            var objectContext = oEvent.getSource().getBindingContext("employeeModel").getObject();
 
             //slug: header parameter allow send key values for the file
             var oCustomerHeaderSlug = new sap.m.UploadCollectionParameter({
                 name: "slug",
-                value: this.getOwnerComponent().SapId + ";" + objectContext.EmployeeId + ";" + fileName
+                value: this.getOwnerComponent().SapId + ";" + this._model.getData().EmployeeId + ";" + fileName
             });
 
             //add slug parameter to previous parameters of the media object
             oEvent.getParameters().addHeaderParameter(oCustomerHeaderSlug);
+           
             setTimeout(function () {
                 MessageToast.show("Event beforeUploadStarts triggered");
             }, 4000);
@@ -458,11 +518,32 @@ sap.ui.define([
                 value: this.getView().getModel("employeeModel").getSecurityToken()
             });
             oUploadCollection.addHeaderParameter(oCustomerHeaderToken);
+            //oEvent.getSource().getBinding("items").refresh();
         },
 
         //update collection after a new file has been uploaded
         onFileUploadComplete: function (oEvent) {
-            oEvent.getSource().getBinding("items").refresh();
+            //oEvent.getSource().getBinding("items").refresh();
+            // var oUploadCollection = oEvent.getSource();
+            //oUploadCollection.setUploadUrl(null);
+
+            MessageToast.show("Event uploadComplete triggered");
+
+            // var sUploadedFileName = oEvent.getParameter("files")[0].fileName;
+            // setTimeout(function () {
+            //     var oUploadCollection = this.byId("UploadCollection");
+
+            //     for (var i = 0; i < oUploadCollection.getItems().length; i++) {
+            //         if (oUploadCollection.getItems()[i].getFileName() === sUploadedFileName) {
+            //             oUploadCollection.removeItem(oUploadCollection.getItems()[i]);
+            //             break;
+            //         }
+            //     }
+
+            //     // delay the success message in order to see other messages before
+            //     MessageToast.show("Event uploadComplete triggered");
+            // }.bind(this), 8000);
+
         },
 
         //delete files in sap-system
@@ -523,5 +604,5 @@ sap.ui.define([
 
 
 
-         });
     });
+});
