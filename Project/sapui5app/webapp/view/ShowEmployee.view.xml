@@ -1,59 +1,85 @@
 <mvc:View controllerName="logaligroup.sapui5app.controller.ShowEmployee" displayBlock="true"
     xmlns="sap.m"
     xmlns:f="sap.f"
-    xmlns:mvc="sap.ui.core.mvc">
-    <f:DynamicPage id="dynamicPageId" toggleHeaderOnTitleClick="false">
-        <!-- DynamicPage Title -->
-        <!-- <f:title>
-            <f:DynamicPageTitle>
-                <f:heading>
-                    <Title text="Products ({products>/ProductCollectionStats/Counts/Total})"/>
-                </f:heading>
-            </f:DynamicPageTitle>
-        </f:title> -->
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:custom="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">>
 
-        <!-- DynamicPage Content -->
-        <f:content>
-            <Table id="employeeTable" inset="false" items="{employeeModel>/Users}" class="sapFDynamicPageAlignContent" width="auto">
-                <headerToolbar>
-                    <OverflowToolbar>
-                        <ToolbarSpacer/>
-                        <SearchField search="onSearch" width="17.5rem"/>
-                    </OverflowToolbar>
-                </headerToolbar>
-            <columns>
-                <Column visible="true">
-                    <header>
-                        <Label text="{i18n>firstName}"/>
-                    </header>
-                </Column>
-                <Column visible="true">
-                    <header>
-                        <Label text="{i18n>dni}"/>
-                    </header>
-                </Column>
-            </columns>
+    <SplitApp id="SplitAppEmployee" initialMaster="master" initialDetail="detail">
+        <masterPages >
+            <Page id="master" backgroundDesign= "List">
+                <List items="{employeeModel>/Users}">
+                    <headerToolbar>
+                        <Toolbar enabled="true" visible="true" width="" design="Solid">
+                            <content>
+                                <SearchField placeholder="Buscar" showSearchButton="true" visible="true" width="100%" />
+                            </content>
+                        </Toolbar>
+                    </headerToolbar>
 
+                    <items>
+                        <StandardListItem title="{employeeModel>FirstName} {employeeModel>LastName}" description="{employeeModel>Dni}" type="Navigation" press=".onPressNavToDetail" custom:to="employeeDetail" />
+                    </items>
+                </List>
+            </Page>
+        </masterPages>
 
-                <items>
-               <!--<ColumnListItem type="Active" press="showPostalcode">-->
-                <ColumnListItem type="Navigation" press="showEmployeeDetail">
-                    <cells>
-                        <Label text="{employeeModel>LastName}"/>
-                        <Label text="{employeeModel>Dni}"/>
-                    </cells>
-                </ColumnListItem>
-                </items>
-            </Table>
-        </f:content>
+        <detailPages>
+            <Page id="detail" backgroundDesign= "Solid" titleLevel="Auto" showHeader="false">
+                <VBox direction="Column" alignItems="Center" justifyContent="Center" fitContainer="true">
+                    <Text text="{i18n>msgSelectEmployee}" visible="true"/>
+                </VBox>
+                <Panel >
+                </Panel>
+            </Page>
 
-        <!-- DynamicPage Footer -->
-        <f:footer>
-            <OverflowToolbar>
-                <ToolbarSpacer/>
-                <Button type="Accept" text="Accept"/>
-                <Button type="Reject" text="Reject"/>
-            </OverflowToolbar>
-        </f:footer>
-    </f:DynamicPage>
+            <Page id="employeeDetail" backgroundDesign= "Solid" titleLevel="Auto" showHeader="true" title="{i18n>employeeDetail}">
+                <Panel>
+                    <ObjectHeader title="{employeeModel>FirstName} {employeeModel>LastName}" icon="sap-icon://employee-pane" titleActive="false" 
+                                  condensed="false" visible="true">
+                        <attributes  />
+                        <statuses/>
+                        <markers />
+                    </ObjectHeader>
+
+                    <IconTabBar expandable="false" expanded="true" applyContentPadding="false" upperCase="false" visible="true" selectedKey="Ok" backgroundDesign="Transparent" headerBackgroundDesign="Transparent">
+                        <items >
+                            <IconTabFilter icon="sap-icon://attachment" 
+                            text="{i18n>files}" design="Horizontal" showAll="false" textDirection="Inherit" enabled="true" visible="true" >
+                                <content>
+                            <Panel>
+                                <!--component to upload files FilesSet-->
+                                <UploadCollection id="UploadCollection"
+                                                  maximumFilenameLength="55" 
+                                                  maximumFileSize="10" 
+                                                  multiple="true" 
+                                                  sameFilenameAllowed="false" 
+                                                  instantUpload="false" 
+                                                  numberOfAttachmentsText="{i18n>attachment}" 
+                                                  uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/UserToAttachments" 
+                                                  change="onFileChange" 
+                                                  uploadComplete="onFileUploadComplete" 
+                                                  beforeUploadStarts="onFileBeforeUpload" 
+                                                  fileDeleted="onFileDeleted"
+                                                  bindingContexts="" />
+                            </Panel>
+                                </content>
+                            </IconTabFilter>
+
+                            <IconTabFilter icon="sap-icon://money-bills" text="{i18n>record}" design="Horizontal" showAll="false" textDirection="Inherit" enabled="true" visible="true">
+                                <content>
+                                    <Text text="Notes go here ..." width="auto" maxLines="1" wrapping="false" textAlign="Begin" textDirection="Inherit" visible="true"/>
+                                </content>
+                            </IconTabFilter>
+                        </items>
+
+                        <content>
+                            <Text text="Tab Bar Content goes here ..." width="auto" maxLines="1" wrapping="false" textAlign="Begin" textDirection="Inherit" visible="true"/>
+                        </content>
+                    </IconTabBar>
+                </Panel>
+            </Page>
+        </detailPages>
+
+    </SplitApp>
+
 </mvc:View>

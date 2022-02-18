@@ -22,43 +22,46 @@ function (JSONModel, Controller, Filter, FilterOperator, Sorter, MessageBox) {
 
         return Controller.extend("logaligroup.sapui5app.controller.ShowEmployee", {
             onInit: function () {
-                this.oRouter = this.getOwnerComponent().getRouter();
-                this._bDescendingSort = false;
+            //config data view properties
+            //var oJSONModelConfig = new sap.ui.model.json.JSONModel({});
+            //this.getView().setModel(oJSONModelConfig, "jsonModelConfig");
+
+
+                // this.oRouter = this.getOwnerComponent().getRouter();
+                // this._bDescendingSort = false;
+                this._bus = sap.ui.getCore().getEventBus();
+                //this.getView().getModel("jsonModelConfig").setProperty("/textInit", true);
             },
-            onListItemPress: function (oEvent) {
-                var oNextUIState = this.getOwnerComponent().getHelper().getNextUIState(1),
-                    productPath = oEvent.getSource().getBindingContext("products").getPath(),
-                    product = productPath.split("/").slice(-1).pop();
-    
-                this.oRouter.navTo("detail", {layout: oNextUIState.layout, product: product});
-            },
+
             onSearch: function (oEvent) {
-                var oTableSearchState = [],
-                    sQuery = oEvent.getParameter("query");
+                // var oTableSearchState = [],
+                //     sQuery = oEvent.getParameter("query");
     
-                if (sQuery && sQuery.length > 0) {
-                    oTableSearchState = [new Filter("Name", FilterOperator.Contains, sQuery)];
+                // if (sQuery && sQuery.length > 0) {
+                //     oTableSearchState = [new Filter("Name", FilterOperator.Contains, sQuery)];
+                // }
+    
+                // this.getView().byId("productsTable").getBinding("items").filter(oTableSearchState, "Application");
+            },
+    
+            onPressNavToDetail: function(oEvent){
+                var path = oEvent.getSource().getBindingContext("employeeModel").getPath();
+                if (path) {
+                    //this.getView().getModel("jsonModelConfig").setProperty("/textInit", false);
+
+                    //bin employee data
+                    this.getView().bindElement("employeeModel>" + path);
+
+                    //bind attachments data
+
+                    //bind salary data
+
+                    this.byId("SplitAppEmployee").to(this.createId("employeeDetail"));
                 }
-    
-                this.getView().byId("productsTable").getBinding("items").filter(oTableSearchState, "Application");
-            },
-    
-            onAdd: function (oEvent) {
-                MessageBox.show("This functionality is not ready yet.", {
-                    icon: MessageBox.Icon.INFORMATION,
-                    title: "Aw, Snap!",
-                    actions: [MessageBox.Action.OK]
-                });
-            },
-    
-            onSort: function (oEvent) {
-                this._bDescendingSort = !this._bDescendingSort;
-                var oView = this.getView(),
-                    oTable = oView.byId("productsTable"),
-                    oBinding = oTable.getBinding("items"),
-                    oSorter = new Sorter("Name", this._bDescendingSort);
-    
-                oBinding.sort(oSorter);
+
+                
             }
+
+
         });
     });
