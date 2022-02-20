@@ -2,29 +2,31 @@
     xmlns="sap.m"
     xmlns:f="sap.f"
     xmlns:mvc="sap.ui.core.mvc"
-    xmlns:custom="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">>
+    xmlns:suite="sap.suite.ui.commons"
+    xmlns:custom="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
 
-    <SplitApp id="SplitAppEmployee" initialMaster="master" initialDetail="detail">
-        <masterPages >
-            <Page id="master" backgroundDesign= "List">
-                <List items="{employeeModel>/Users}">
+    <SplitApp id="SplitAppEmployee" initialMaster="master" initialDetail="detail" backgroundColor="100">
+        <masterPages  >
+            <Page id="master" backgroundDesign= "List" showHeader="false">
+                <List id="employeeList" items="{employeeModel>/Users}">
                     <headerToolbar>
-                        <Toolbar enabled="true" visible="true" width="" design="Solid">
+                        <Toolbar enabled="true" visible="true" width="" design="Solid" style="Standard">
                             <content>
-                                <SearchField placeholder="Buscar" showSearchButton="true" visible="true" width="100%" />
+                                <Button icon="sap-icon://navigation-left-arrow" enabled="true"/>
+                                <SearchField placeholder="Buscar" showSearchButton="true" visible="true" width="100%" liveChange=".onSearchField"/>
                             </content>
                         </Toolbar>
                     </headerToolbar>
 
                     <items>
-                        <StandardListItem title="{employeeModel>FirstName} {employeeModel>LastName}" description="{employeeModel>Dni}" type="Navigation" press=".onPressNavToDetail" custom:to="employeeDetail" />
+                        <StandardListItem title="{employeeModel>FirstName} {employeeModel>LastName}" description="{employeeModel>Dni}" type="Active" press=".onPressNavToDetail" custom:to="employeeDetail" />
                     </items>
                 </List>
             </Page>
         </masterPages>
 
         <detailPages>
-            <Page id="detail" backgroundDesign= "Solid" titleLevel="Auto" showHeader="false">
+            <Page id="detail" titleLevel="Auto" showHeader="false">
                 <VBox direction="Column" alignItems="Center" justifyContent="Center" fitContainer="true">
                     <Text text="{i18n>msgSelectEmployee}" visible="true"/>
                 </VBox>
@@ -32,51 +34,68 @@
                 </Panel>
             </Page>
 
-            <Page id="employeeDetail" backgroundDesign= "Solid" titleLevel="Auto" showHeader="true" title="{i18n>employeeDetail}">
-                <Panel>
-                    <ObjectHeader title="{employeeModel>FirstName} {employeeModel>LastName}" icon="sap-icon://employee-pane" titleActive="false" 
-                                  condensed="false" visible="true">
-                        <attributes  />
-                        <statuses/>
-                        <markers />
-                    </ObjectHeader>
-
-                    <IconTabBar expandable="false" expanded="true" applyContentPadding="false" upperCase="false" visible="true" selectedKey="Ok" backgroundDesign="Transparent" headerBackgroundDesign="Transparent">
-                        <items >
-                            <IconTabFilter icon="sap-icon://attachment" 
-                            text="{i18n>files}" design="Horizontal" showAll="false" textDirection="Inherit" enabled="true" visible="true" >
-                                <content>
-                            <Panel>
-                                <!--component to upload files FilesSet-->
-                                <UploadCollection id="UploadCollection"
-                                                  maximumFilenameLength="55" 
-                                                  maximumFileSize="10" 
-                                                  multiple="true" 
-                                                  sameFilenameAllowed="false" 
-                                                  instantUpload="false" 
-                                                  numberOfAttachmentsText="{i18n>attachment}" 
-                                                  uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/UserToAttachments" 
-                                                  change="onFileChange" 
-                                                  uploadComplete="onFileUploadComplete" 
-                                                  beforeUploadStarts="onFileBeforeUpload" 
-                                                  fileDeleted="onFileDeleted"
-                                                  bindingContexts="" />
-                            </Panel>
-                                </content>
-                            </IconTabFilter>
-
-                            <IconTabFilter icon="sap-icon://money-bills" text="{i18n>record}" design="Horizontal" showAll="false" textDirection="Inherit" enabled="true" visible="true">
-                                <content>
-                                    <Text text="Notes go here ..." width="auto" maxLines="1" wrapping="false" textAlign="Begin" textDirection="Inherit" visible="true"/>
-                                </content>
-                            </IconTabFilter>
-                        </items>
-
-                        <content>
-                            <Text text="Tab Bar Content goes here ..." width="auto" maxLines="1" wrapping="false" textAlign="Begin" textDirection="Inherit" visible="true"/>
-                        </content>
-                    </IconTabBar>
+            <Page id="employeeDetail" showHeader="false">
+                <Panel backgroundDesign="Transparent" height="auto">
+                    <HBox direction="Row" justifyContent="Center">
+                        <Text text="{i18n>employeeDetail}" visible="true" />
+                    </HBox>
                 </Panel>
+
+                <ObjectHeader icon="{/_iconType}" iconAlt="{employeeModel>Dni}" responsive="true" title="{employeeModel>FirstName} {employeeModel>LastName}" intro="{employeeModel>Dni}" imageShape="Square" titleLevel="Auto" backgroundDesign="Transparent">
+                    <!-- <attributes> -->
+                    <ObjectAttribute title="{i18n>creationDate}" text="{employeeModel>CreationDate}" />
+                    <ObjectAttribute title="{i18n>type}" text="{= ${employeeModel>Type}==='0' ? ${i18n>intern} : 
+                                                                        ${employeeModel>Type}==='1' ? ${i18n>freelance} : 
+                                                                        ${employeeModel>Type}==='2' ? ${i18n>manager} : ''}"/>
+                    <ObjectAttribute title="{i18n>comments}" text="{employeeModel>Comments}" />
+                    <!-- </attributes> -->
+                </ObjectHeader>
+
+
+                <!-- <Panel backgroundDesign="Solid"> -->
+                <!-- <IconTabBar expandable="false" expanded="true" applyContentPadding="false" upperCase="false" visible="true" selectedKey="Ok" backgroundDesign="Transparent" headerBackgroundDesign="Transparent" class="sapUiResponsiveContentPadding">
+                                <items>
+                                    <IconTabFilter icon="sap-icon://attachment" text="{i18n>files}" design="Horizontal" showAll="false" textDirection="Inherit" enabled="true" visible="true">
+                                        <UploadCollection id="UploadCollection" maximumFilenameLength="55" maximumFileSize="10" multiple="true" sameFilenameAllowed="false" instantUpload="false" uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments" change="onFileChange" uploadComplete="onFileUploadComplete" beforeUploadStarts="onFileBeforeUpload" fileDeleted="onFileDeleted"/>
+                                    </IconTabFilter>
+                                    <IconTabFilter icon="sap-icon://money-bills" count="12">
+                                        <Text text="Notes go here ..." />
+                                    </IconTabFilter>
+                                </items>
+                            </IconTabBar> -->
+
+                <IconTabBar expandable="false" expanded="true" applyContentPadding="false" upperCase="false" visible="true" selectedKey="Ok" class="sapUiResponsiveContentPadding" backgroundDesign="Translucent" headerBackgroundDesign="Transparent">
+                    <items >
+                        <IconTabFilter icon="sap-icon://attachment" text="{i18n>files}" design="Horizontal" showAll="false" textDirection="Inherit" enabled="true" visible="true">
+                            <!-- <content backgroundDesign="Solid"> -->
+
+                            <!-- component to upload files FilesSet -->
+                            <UploadCollection id="UploadCollection" maximumFilenameLength="55" maximumFileSize="10" multiple="true" 
+                                              sameFilenameAllowed="false" instantUpload="false" 
+                                              uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments" change="onFileChange" 
+                                              uploadComplete="onFileUploadComplete" beforeUploadStarts="onFileBeforeUpload" 
+                                              fileDeleted="onFileDeleted"/>
+
+                            <!-- </content> -->
+                        </IconTabFilter>
+
+                        <IconTabFilter icon="sap-icon://money-bills" text="{i18n>record}" design="Horizontal" showAll="false" textDirection="Inherit" enabled="true" visible="true">
+                            <suite:Timeline id="idTimeline" enableDoubleSided="true" content="{employeeModel>/Salaries}" showHeaderBar="false">
+                                    <suite:TimelineItem id="idTemplateItem" 
+                                                          dateTime="{/CreationDate}" 
+                                                          title="{/Amount}" 
+                                                          text="{/Comments}">
+                                    </suite:TimelineItem>
+                            </suite:Timeline>
+
+                        </IconTabFilter>
+                    </items>
+
+                </IconTabBar>
+
+
+
+                <!-- </Panel> -->
             </Page>
         </detailPages>
 
