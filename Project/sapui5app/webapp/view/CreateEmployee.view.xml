@@ -40,9 +40,6 @@
                                 <Label text="{jsonModelConfig>/dniLabel}" required="true"/>
                                 <Input value="{/Dni}" valueState="{/_dniState}" liveChange="onChangeDni"/>
 
-                                <!-- <Label text="{i18n>cif}" required="true"/>
-                                <Input value="{/Dni}" valueLiveUpdate="true"/> -->
-
                                 <Label text="{jsonModelConfig>/salaryLabel}"/>
                                 <Slider enableTickmarks="true" class="sapUiSmallMarginBottom" min="{jsonModelConfig>/salaryMin}" max="{jsonModelConfig>/salaryMax}" 
                                         value="{/Salary}" width="auto" progress="true" step="{jsonModelConfig>/salaryStep}"/>
@@ -55,11 +52,9 @@
                         <!--step 3: Additional data-->
                         <WizardStep id="AdditionalDataStep" validated="true" title="{i18n>additionalData}">
                             <MessageStrip class="sapUiSmallMarginBottom" text="{i18n>msgAddData}" showIcon="true"/>
-                            <!-- <form:SimpleForm editable="true"> -->
 
                             <Label text="{i18n>comments}"/>
                             <TextArea id="TextArea" cols="200" height="100px" value="{/Comments}"/>
-                            <!-- </form:SimpleForm> -->
 
                             <Panel>
                                 <!--component to upload files FilesSet-->

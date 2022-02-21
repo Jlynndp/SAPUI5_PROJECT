@@ -34,36 +34,17 @@ sap.ui.define([
                 this._splitAppEmployee = this.byId("SplitAppEmployee");
             },
 
+            onBack: function() {
+
+
+            },
+
+
             onSearchField: function (oEvent) {
-                // var oTableSearchState = [],
-                //     sQuery = oEvent.getParameter("query");
-
-                // if (sQuery && sQuery.length > 0) {
-                //     oTableSearchState = [new Filter("Name", FilterOperator.Contains, sQuery)];
-                // }
-
-                // this.getView().byId("productsTable").getBinding("items").filter(oTableSearchState, "Application");
-
-                //var oJSONData = this.getView().getModel("employeeModel").getData();
                 var aFilters = [];
-
                 var sQuery = oEvent.getSource().getValue();
 
                 if (sQuery && sQuery.length > 0) {
-                    // var filter1 = new Filter({
-                    //     path: "FirstName", 
-                    //     operator: FilterOperator.Contains, 
-                    //     value1: sQuery
-
-                    // });
-                    // aFilters.push(filter1);
-
-                    // var filter2 = new Filter("LastName", FilterOperator.Contains, sQuery);
-                    // aFilters.push(filter2);
-
-                    // var filter3 = new Filter("Dni", FilterOperator.Contains, sQuery);
-                    // aFilters.push(filter3);
-
                     aFilters = new Filter({
                         filters: [
                             new Filter({
@@ -90,8 +71,6 @@ sap.ui.define([
                 var oList = this.byId("employeeList");
                 var oBinding = oList.getBinding("items");
                 oBinding.filter(aFilters, "Application");
-
-
             },
 
             onPressNavToDetail: function (oEvent) {
@@ -99,24 +78,8 @@ sap.ui.define([
                 var sPath = oContext.getPath();
 
                 if (sPath) {
-                    //this.getView().getModel("jsonModelConfig").setProperty("/textInit", false);
-
                     //bin employee data
                     this.getView().bindElement("employeeModel>" + sPath);
-
-                    // //bind files
-                    // this.byId("UploadCollection").bindAggregation("items", {
-                    //     path: "employeeModel>/Attachments",
-                    //     filters: [
-                    //         new Filter("SapId", FilterOperator.EQ, oContext.getProperty("SapId")),
-                    //         new Filter("EmployeeId", FilterOperator.EQ, oContext.getProperty("EmployeeId")),
-                    //     ],
-                    //     template: new sap.m.UploadCollectionItem({
-                    //         documentId: "{employeeModel>AttId}",
-                    //         visibleEdit: false,
-                    //         fileName: "{employeeModel>DocName}"
-                    //     }).attachPress(this.downloadFile)
-                    // });
 
                     var employeeIcon = "";
                     switch (oContext.getProperty("Type")) {
@@ -240,32 +203,89 @@ sap.ui.define([
 
                             //go back to main screen (refresh model)                                   
                             // this.onPressNavToDetail();
-                            
+
                         }
                     }.bind(this)
                 });
-                
+
             },
 
 
             //add new Salary entity
             onPromoteEmployee: function (oEvent) {
+                //get employee Id
+                var sapId = oEvent.getSource().getBindingContext("employeeModel").getProperty("SapId");
+                var employeeId = oEvent.getSource().getBindingContext("employeeModel").getProperty("EmployeeId");
 
+                var oJSONModel = new sap.ui.model.json.JSONModel({
+                    SapId: sapId,
+                    EmployeeId: employeeId
+                });
+
+                this.getView().setModel(oJSONModel, "Salary");
+
+                //get selected controller
+                //var iconPressed = oEvent.getSource();
+
+                //context from the model
+                //var oContext = oEvent.getSource().getBindingContext("employeeModel");
+                //var oContext = iconPressed.getBindingContext("odataNorthwind");
+
+                //get fragment instance
+                if (!this._oDialogPromoteEmpl) {
+                    this._oDialogPromoteEmpl = sap.ui.xmlfragment("logaligroup.sapui5app.fragment.DialogPromoteEmpl", this);
+                    this.getView().addDependent(this._oDialogPromoteEmpl);
+                };
+
+                //dialog binding to the context to have access to the data of selected item
+                // this._oDialogOrders.bindElement("jsonEmployees>" + oContext.getPath());
+                //this._oDialogPromote.bindElement("employeeModel>" + oContext.getPath());
+                this._oDialogPromoteEmpl.open();
+
+            },
+
+            onSavePromotion: function () {
+                var oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
+
+                //this._handleMessageBoxOpen(oResourceBundle.getText("msgCreateEmpl"), "confirm");
+
+                //submit Employee: “/sap/opu/odata/sap/ZEMPLOYEES_SRV/Salaries”
+
+                //get employee
+                var salaryModel = this.getView().getModel("Salary").getData();
+                var employeeModel = this.getView().getModel("employeeModel");
+
+                var date = new Date(salaryModel.CreationDate);
+                var creationDate = date.toJSON().slice(0, 19);
+
+                //validate required fields
+
+                //build create operation body
+                var body = {
+                    SapId: salaryModel.SapId,
+                    EmployeeId: salaryModel.EmployeeId,
+                    CreationDate: creationDate,
+                    Amount: parseFloat(salaryModel.Amount).toString(),
+                    Comments: salaryModel.Comments
+                };
+
+                //save promotion: get view/model/create_operation
+                this.getView().getModel("employeeModel").create("/Salaries", body, {
+                    success: function (data) {
+                        sap.m.MessageToast.show(oResourceBundle.getText("msgPromotionOK"));
+                        this._oDialogPromoteEmpl.close();
+                        employeeModel.refresh();
+                    }.bind(this),
+
+                    error: function (e) {
+                        sap.m.MessageToast.show(oResourceBundle.getText("oDataSaveKO"));
+                    }.bind(this)
+                });
+            },
+
+            onCancelPromotion: function () {
+                this._oDialogPromoteEmpl.close();
             }
-
-            // //confirmation message
-            // _handleMessageBoxOpen: function (sMessage, sMessageBoxType) {
-            //     MessageBox[sMessageBoxType](sMessage, {
-            //         actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-            //         onClose: function (oAction) {
-            //             if (oAction === MessageBox.Action.YES) {
-            //                 this._handleNavigationToStep(0);
-            //                 this._wizard.invalidateStep(this.byId("EmployeeTypeStep"));
-            //                 this._wizard.discardProgress(this._wizard.getSteps()[0]);
-            //             }
-            //         }.bind(this)
-            //     });
-            // },
 
 
         });

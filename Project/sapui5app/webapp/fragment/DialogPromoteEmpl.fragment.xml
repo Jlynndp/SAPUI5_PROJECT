@@ -1,0 +1,25 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m">
+    <Dialog id="_IDGenDialog1" title="{i18n>titleNewPromotion}" type="Message">
+        <content>
+            <!-- <core:Fragment fragmentName="logaligroup.Employees.fragment.TableOrders" type="XML"/> -->
+            <form:SimpleForm id="_IDGenSimpleForm1" editable="true">
+
+                <Label text="{i18n>salary}" required="true" labelFor="I_Salary"/>
+                <Input id="I_Salary" value="{Salary>/Amount}" />
+
+                <Label text="{i18n>date}" required="true" labelFor="I_Date"/>
+                <DatePicker id="I_Date" value="{Salary>/CreationDate}"/>
+
+                <Label text="{i18n>comments}" required="true" labelFor="I_Comments"/>
+                <TextArea id="I_Comments" height="100px" value="{Salary>/Comments}"/>
+            </form:SimpleForm>
+        </content>
+
+        <buttons>
+            <Button id="_IDGenButton1" text="{i18n>btnAccept}" press="onSavePromotion" />
+            <Button id="_IDGenButton2" text="{i18n>btnCancel}" press="onCancelPromotion" />
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

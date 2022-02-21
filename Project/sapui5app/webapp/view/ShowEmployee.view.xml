@@ -12,7 +12,7 @@
                     <headerToolbar>
                         <Toolbar enabled="true" visible="true" width="" design="Solid" style="Standard">
                             <content>
-                                <Button icon="sap-icon://navigation-left-arrow" enabled="true"/>
+                                <Button icon="sap-icon://navigation-left-arrow" enabled="true" press=".onBack"/>
                                 <SearchField placeholder="Buscar" showSearchButton="true" visible="true" width="100%" liveChange=".onSearchField"/>
                             </content>
                         </Toolbar>
@@ -37,7 +37,7 @@
             <Page id="employeeDetail" showHeader="false">
                 <Panel backgroundDesign="Transparent" height="auto">
                     <HBox direction="Row" justifyContent="Center">
-                        <Text text="{i18n>employeeDetail}" visible="true" />
+                        <Text text="{i18n>titleEmployeeDetail}" visible="true" />
                     </HBox>
                 </Panel>
 
@@ -105,7 +105,7 @@
                                             groupBy="CreationDate"
                                             sortOldestFirst="true"
                                             enableScroll="false"
-                                            height="">
+                                            height="100%">
                                     <suite:TimelineItem id="idTemplateItem" 
                                                         title="{
                                                                 parts: [

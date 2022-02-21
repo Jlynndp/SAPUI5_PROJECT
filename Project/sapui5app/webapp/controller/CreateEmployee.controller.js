@@ -291,43 +291,6 @@ sap.ui.define([
         // },
 
 
-
-        // optionalStepActivation: function () {
-        // 	MessageToast.show(
-        // 		'This event is fired on activate of Step3.'
-        // 	);
-        // },
-
-        // optionalStepCompletion: function () {
-        // 	MessageToast.show(
-        // 		'This event is fired on complete of Step3. You can use it to gather the information, and lock the input data.'
-        // 	);
-        // },
-
-        // pricingActivate: function () {
-        // 	this.model.setProperty("/navApiEnabled", true);
-        // },
-
-        // pricingComplete: function () {
-        // 	this.model.setProperty("/navApiEnabled", false);
-        // },
-
-        // scrollFrom4to2: function () {
-        // 	this._wizard.goToStep(this.byId("ProductInfoStep"));
-        // },
-
-        // goFrom4to3: function () {
-        // 	if (this._wizard.getProgressStep() === this.byId("PricingStep")) {
-        // 		this._wizard.previousStep();
-        // 	}
-        // },
-
-        // goFrom4to5: function () {
-        // 	if (this._wizard.getProgressStep() === this.byId("PricingStep")) {
-        // 		this._wizard.nextStep();
-        // 	}
-        // },
-
         onWizardCompleted: function () {
             //get files
             var files = this.byId("UploadCollection").getItems();
@@ -408,10 +371,12 @@ sap.ui.define([
         },
 
         onWizardSubmit: function (oEvent) {
-            this._handleMessageBoxOpen("Are you sure you want to submit your report?", "confirm");
+            var oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
+
+            this._handleMessageBoxOpen(oResourceBundle.getText("msgCreateEmpl"), "confirm");
 
             //submit Employee: “/sap/opu/odata/sap/ZEMPLOYEES_SRV/Users”
-            var oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
+           
 
             //get ID for selected employee: model/object/property
             var employeeId = this.getView().getModel().getData().EmployeeId;
@@ -419,12 +384,12 @@ sap.ui.define([
             //get employee
             var employeeModel = this.getView().getModel().getData();
 
-            const date = new Date(employeeModel.CreationDate);
-            const creationDate = date.toJSON().slice(0, 19);
+            var date = new Date(employeeModel.CreationDate);
+            var creationDate = date.toJSON().slice(0, 19);
 
             if (typeof employeeId == 'undefined') {
                 //build create operation body
-                var body_user = {
+                var body = {
                     SapId: this.getOwnerComponent().SapId,
                     Type: employeeModel.Type,
                     FirstName: employeeModel.FirstName,
@@ -440,7 +405,7 @@ sap.ui.define([
                 };
 
                 //save new employee: get view/model/create_operation
-                this.getView().getModel("employeeModel").create("/Users", body_user, {
+                this.getView().getModel("employeeModel").create("/Users", body, {
                     success: function (data) {
                         //this.onReadDataEmployee.bind(this)(employeeId);
                         //sap.m.MessageToast.show(oResourceBundle.getText("oDataSaveOK"));
@@ -458,7 +423,7 @@ sap.ui.define([
                         };
 
                         //upload attachments: “/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments”
-                        sap.m.MessageBox.success(oResourceBundle.getText("oDataSaveOK"));
+                        //sap.m.MessageBox.success(oResourceBundle.getText("oDataSaveOK"));
 
 
                     }.bind(this),
@@ -467,9 +432,6 @@ sap.ui.define([
                     }.bind(this)
                 });
             };
-
-
-
         },
 
         discardProgress: function () {
