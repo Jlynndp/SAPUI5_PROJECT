@@ -504,9 +504,9 @@ sap.ui.define([
             //add slug parameter to previous parameters of the media object
             oEvent.getParameters().addHeaderParameter(oCustomerHeaderSlug);
            
-            setTimeout(function () {
-                MessageToast.show("Event beforeUploadStarts triggered");
-            }, 4000);
+            // setTimeout(function () {
+            //     MessageToast.show("Event beforeUploadStarts triggered");
+            // }, 4000);
         },
 
         //update token every time files change

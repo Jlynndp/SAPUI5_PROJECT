@@ -5,7 +5,7 @@
     xmlns:suite="sap.suite.ui.commons"
     xmlns:custom="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
 
-    <SplitApp id="SplitAppEmployee" initialMaster="master" initialDetail="detail" backgroundColor="100">
+    <SplitApp id="SplitAppEmployee" initialMaster="master" initialDetail="detailSelectEmpl" backgroundColor="100">
         <masterPages  >
             <Page id="master" backgroundDesign= "List" showHeader="false">
                 <List id="employeeList" items="{employeeModel>/Users}">
@@ -19,14 +19,14 @@
                     </headerToolbar>
 
                     <items>
-                        <StandardListItem title="{employeeModel>FirstName} {employeeModel>LastName}" description="{employeeModel>Dni}" type="Active" press=".onPressNavToDetail" custom:to="employeeDetail" />
+                        <StandardListItem title="{employeeModel>FirstName} {employeeModel>LastName}" description="{employeeModel>Dni}" type="Active" press="onPressNavToDetail" custom:to="employeeDetail" />
                     </items>
                 </List>
             </Page>
         </masterPages>
 
         <detailPages>
-            <Page id="detail" titleLevel="Auto" showHeader="false">
+            <Page id="detailSelectEmpl" titleLevel="Auto" showHeader="false">
                 <VBox direction="Column" alignItems="Center" justifyContent="Center" fitContainer="true">
                     <Text text="{i18n>msgSelectEmployee}" visible="true"/>
                 </VBox>
@@ -43,10 +43,13 @@
 
                 <ObjectHeader icon="{/_iconType}" iconAlt="{employeeModel>Dni}" responsive="true" title="{employeeModel>FirstName} {employeeModel>LastName}" intro="{employeeModel>Dni}" imageShape="Square" titleLevel="Auto" backgroundDesign="Transparent">
                     <!-- <attributes> -->
-                    <ObjectAttribute title="{i18n>creationDate}" text="{employeeModel>CreationDate}" />
+                    <ObjectAttribute title="{i18n>creationDate}" text="{path:'employeeModel>CreationDate', 
+                                                                        type:'sap.ui.model.odata.type.Date', 
+                                                                        formatOptions: { style: 'long'}
+                                                                        }"/>
                     <ObjectAttribute title="{i18n>type}" text="{= ${employeeModel>Type}==='0' ? ${i18n>intern} : 
-                                                                        ${employeeModel>Type}==='1' ? ${i18n>freelance} : 
-                                                                        ${employeeModel>Type}==='2' ? ${i18n>manager} : ''}"/>
+                                                                ${employeeModel>Type}==='1' ? ${i18n>freelance} : 
+                                                                ${employeeModel>Type}==='2' ? ${i18n>manager} : ''}"/>
                     <ObjectAttribute title="{i18n>comments}" text="{employeeModel>Comments}" />
                     <!-- </attributes> -->
                 </ObjectHeader>
@@ -70,32 +73,71 @@
                             <!-- <content backgroundDesign="Solid"> -->
 
                             <!-- component to upload files FilesSet -->
-                            <UploadCollection id="UploadCollection" maximumFilenameLength="55" maximumFileSize="10" multiple="true" 
-                                              sameFilenameAllowed="false" instantUpload="false" 
-                                              uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments" change="onFileChange" 
-                                              uploadComplete="onFileUploadComplete" beforeUploadStarts="onFileBeforeUpload" 
-                                              fileDeleted="onFileDeleted"/>
-
+                            <UploadCollection id="UploadCollection" 
+                                              maximumFilenameLength="55" 
+                                              maximumFileSize="10" 
+                                              multiple="true" 
+                                              sameFilenameAllowed="false" 
+                                              instantUpload="true" 
+                                              uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments"
+                                              items="{employeeModel>UserToAttachment}" 
+                                              change="onFileChange" 
+                                              uploadComplete="onFileUploadComplete" 
+                                              beforeUploadStarts="onFileBeforeUpload" 
+                                              fileDeleted="onFileDeleted">
+                                              <items>
+                                                <UploadCollectionItem documentId="{employeeModel>AttId}" 
+                                                                      fileName="{employeeModel>DocName}" 
+                                                                      enableEdit="false" 
+                                                                      visibleEdit="false" 
+                                                                      press=".downloadFile"/>
+                                              </items>
+                             </UploadCollection>
                             <!-- </content> -->
                         </IconTabFilter>
 
                         <IconTabFilter icon="sap-icon://money-bills" text="{i18n>record}" design="Horizontal" showAll="false" textDirection="Inherit" enabled="true" visible="true">
-                            <suite:Timeline id="idTimeline" enableDoubleSided="true" content="{employeeModel>/Salaries}" showHeaderBar="false">
+                            <suite:Timeline id="idTimeline" 
+                                            enableDoubleSided="true" 
+                                            content="{employeeModel>UserToSalary}" 
+                                            showHeaderBar="false" 
+                                            groupByType="Year"
+                                            groupBy="CreationDate"
+                                            sortOldestFirst="true"
+                                            enableScroll="false"
+                                            height="">
                                     <suite:TimelineItem id="idTemplateItem" 
-                                                          dateTime="{/CreationDate}" 
-                                                          title="{/Amount}" 
-                                                          text="{/Comments}">
+                                                        title="{
+                                                                parts: [
+                                                                    {path: 'employeeModel>Amount'},
+                                                                    {path: 'employeeModel>Waers'}
+                                                                ],
+                                                                type:'sap.ui.model.type.Currency',
+                                                                formatOptions: {
+                                                                    currencyCode: false,
+                                                                    showMeasure: false
+                                                                }
+                                                            }"
+                                                        dateTime="{path:'employeeModel>CreationDate', 
+                                                                   type:'sap.ui.model.odata.type.Date', 
+                                                                   formatOptions: { style: 'long'}
+                                                                   }" 
+                                                        text="{employeeModel>Comments}" icon="sap-icon://circle-task">
                                     </suite:TimelineItem>
                             </suite:Timeline>
 
                         </IconTabFilter>
                     </items>
-
                 </IconTabBar>
 
-
-
-                <!-- </Panel> -->
+                <footer>
+                    <Bar>
+                        <contentRight>
+                            <Button text="{i18n>btnDelete}" press=".onDeleteEmployee"/>
+                            <Button text="{i18n>btnPromote}" press=".onPromoteEmployee"/>
+                        </contentRight>
+                    </Bar>
+                </footer>
             </Page>
         </detailPages>
 

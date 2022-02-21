@@ -19,9 +19,10 @@
                 </GenericTile>
             </Panel>
 
-            <Panel id="Pnl_Purchase" headerText="{i18n>purchase}" expandable="true" expanded="true" class="sapUiResponsiveMargin" width="auto">
-                <GenericTile id="GT_SignPurchase" press="navToSignPurchase" url="http://bc735977trial-dev-logali-approuter.cfapps.us10.hana.ondemand.com" headerImage="sap-icon://signature" class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout">
-                    <TileContent id="TC_SignPurchase" footer="{i18n>signPurchase}"/>
+            <Panel id="Pnl_Order" headerText="{i18n>orders}" expandable="true" expanded="true" class="sapUiResponsiveMargin" width="auto">
+                <GenericTile id="GT_SignOrder" url="https://bc735977trial-dev-logali-approuter.cfapps.us10.hana.ondemand.com/logaligroupEmployees/index.html" 
+                             headerImage="sap-icon://signature" class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout">
+                    <TileContent id="TC_SignOrder" footer="{i18n>signOrder}"/>
                 </GenericTile>
             </Panel>
         </content>
