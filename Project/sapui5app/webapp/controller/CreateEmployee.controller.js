@@ -15,8 +15,8 @@ sap.ui.define([
             this._bus = sap.ui.getCore().getEventBus();
 
             this._wizard = this.byId("CreateEmployeeWizard");
-            this._oNavContainer = this.byId("wizardNavContainer");
-            this._oWizardContentPage = this.byId("wizardContentPage");
+            this._oNavContainer = this.byId("WizardNavContainer");
+            this._oWizardContentPage = this.byId("WizardContentPage");
 
             this._model = new sap.ui.model.json.JSONModel([]);
             this.getView().setModel(this._model);
@@ -32,50 +32,53 @@ sap.ui.define([
             });
             this.getView().setModel(oJSONModelConfig, "jsonModelConfig");
 
-            //read data
-
-            // var oData = employeeModel.getData();
-            // var index = oData.length;
-            // oData.push({ index : index + 1});
-            // employeeModel.refresh();
-            // newEmployee.bindElement("employeeModel>/" + index);
+            this.getOwnerComponent().getRouter().getRoute("RouteCreateEmployee").attachPatternMatched(this.resetWizard, this);
         },
 
-        // onBeforeRendering: function(){
-        //     this._wizard = this.byId("CreateEmployeeWizard");
-        //     this._oNavContainer = this.byId("wizardNavContainer");
-        //     this._oWizardContentPage = this.byId("wizardContentPage");
+        resetWizard: function (oEvent) {
+            var oParameters = oEvent.getParameters();
+            if (oParameters.name == "RouteCreateEmployee") {
+                // if route matched do your actions
 
-        //     this._model = new sap.ui.model.json.JSONModel([]);
-        //     this.getView().setModel(this._model);
+                // this._wizard = this.byId("CreateEmployeeWizard");
+                // this._oNavContainer = this.byId("WizardNavContainer");
+                // this._oWizardContentPage = this.byId("WizardContentPage");
+                //this._model.setData(null);
 
-        //     //config data view properties
-        //     var oJSONModelConfig = new sap.ui.model.json.JSONModel({
-        //         dniLabel: "",
-        //         salaryLabel: "",
-        //         salaryMin: 0,
-        //         salaryMax: 0,
-        //         salaryValue: 0,
-        //         salaryStep: 0,
-        //     });
-        //     this.getView().setModel(oJSONModelConfig, "jsonModelConfig");
-        // },
+                //this.getView().getModel("jsonModelConfig").setData(null);
 
+                this._model.setProperty("/Type", "");
+                this._model.setProperty("/Salary", "");
+                this.getView().setModel(this._model);
 
-        // //read Employee Entity from oData to get last employeeId
-        // onReadODataEmployee: function(){
-        //     this.getView().getModel("employeeModel").read("/User", {
-        //         filters: [
-        //             new sap.ui.model.Filter("SapId", "EQ", this.getOwnerComponent().SapId)
-        //         ],
-        //         success: function(data){
-        //             var employeeModel = this._model;
-        //                 employeeModel.setData(data.results);
-        //         }.bind(this),
-        //         error: function() {
-        //         }.bind(this)
-        //     })
-        // },
+                var oFirstStep = this._wizard.getSteps()[0];
+                this.discardProgress(oFirstStep);
+                this._wizard.goToStep(oFirstStep);
+                oFirstStep.setValidated(false);
+
+                this._model.removeAllContent();
+
+                // this._handleNavigationToStep(0);
+                // this._wizard.invalidateStep(this.byId("EmployeeTypeStep"));
+
+                //this._model = new sap.ui.model.json.JSONModel([]);
+                //this.getView().setModel(this._model);
+
+                // //config data view properties
+                // var oJSONModelConfig = new sap.ui.model.json.JSONModel({
+                //     dniLabel: "",
+                //     salaryLabel: "",
+                //     salaryMin: 0,
+                //     salaryMax: 0,
+                //     salaryValue: 0,
+                //     salaryStep: 0,
+                // });
+                // this.getView().setModel(oJSONModelConfig, "jsonModelConfig");
+
+                //reset wizard steps
+            }
+
+        },
 
         setEmployeeType: function (oEvent) {
             var employeeType = oEvent.getParameters().item.getKey();
@@ -134,43 +137,6 @@ sap.ui.define([
             oJSONModelConfig.setProperty("/salaryStep", salaryStep);
             this._model.setProperty("/Salary", salary);
             this._wizard.nextStep();
-
-
-            // oJSONModelConfig.setProperty("/ salaryMin", true);
-            // oJSONModelConfig.setProperty("/salaryMax", true);
-            // oJSONModelConfig.setProperty("/salaryValue", false);
-
-            //this._wizard.getCurrentStep().fireComplete();
-
-            //Move to a Step
-            // var cntrlStep3 = this.getView().byId('_id_wizStp3');
-            // this.getView().byId('_id_wizard').goToStep(cntrlStep3);
-
-
-            //this._wizard.attachComplete();
-            //this._wizard.goToStep(this.byId("EmployeeDataStep"));
-            //this._wizard.nextStep();
-            //this._handleNavigationToStep(1);
-
-            // //validate if EmployeeType has changed, discard progress
-            // if (this._wizard.getProgressStep() !== this.byId("EmployeeTypeStep")) {
-            //MessageBox.warning(params.message, {
-            //	actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-            //	onClose: function (oAction) {
-            //		if (oAction === MessageBox.Action.YES) {
-            // this._wizard.discardProgress(this.byId("EmployeeTypeStep"));
-            // history["prevEmployeeTypeSelect"] = this.model.getProperty(/EmployeeType);
-
-            //		} else {
-            //			this.model.setProperty(params.modelPath, history[params.historyPath]);
-            //		}
-            //	}.bind(this)
-            //});
-            // } 
-            //else {
-            //this._wizard.nextStep();
-            // history["prevEmployeeTypeSelect"] = this.model.getProperty("/EmployeeType");
-            //}
         },
 
 
@@ -312,7 +278,7 @@ sap.ui.define([
             } else {
                 this._model.setProperty("/_filesVisible", false);
             }
-            
+
             //go to Review Page
             this._oNavContainer.to(this.byId("wizardReviewPage"));
         },
@@ -364,10 +330,26 @@ sap.ui.define([
         // 	this.model.setProperty(sPath, "n/a");
         // },
 
-        onWizardCancel: function () {
-            this._handleMessageBoxOpen("Are you sure you want to cancel your report?", "warning");
+        onWizardCancel: function (oEvent) {
+            //var employeeModel = this.getView().getModel(); //oEvent.getSource().getModel();
+            var oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
 
-            //back to Menu
+            MessageBox.confirm(oResourceBundle.getText("msgCancelWizard"), {
+                actions: [sap.m.MessageBox.Action.OK, MessageBox.Action.CANCEL],
+                emphasizedAction: sap.m.MessageBox.Action.OK,
+                onClose: function (sAction) {
+                    if (sAction === MessageBox.Action.OK) {
+                        //reset model
+                        //employeeModel.setData(null);
+                        //this.discardProgress(this._wizard.getSteps()[0]);
+
+                        //back to Menu
+                        var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+                        oRouter.navTo("RouteMenu", true);
+
+                    }
+                }.bind(this)
+            });
         },
 
         onWizardSubmit: function (oEvent) {
@@ -376,7 +358,7 @@ sap.ui.define([
             this._handleMessageBoxOpen(oResourceBundle.getText("msgCreateEmpl"), "confirm");
 
             //submit Employee: “/sap/opu/odata/sap/ZEMPLOYEES_SRV/Users”
-           
+
 
             //get ID for selected employee: model/object/property
             var employeeId = this.getView().getModel().getData().EmployeeId;
@@ -417,8 +399,8 @@ sap.ui.define([
                         // //slug parameter: SapId; EmployeeId; FileName
                         // this.onFileBeforeUpload(oEvent);
                         let uploadCollection = this.byId("UploadCollection");
-                        if ( uploadCollection.getItems().length > 0 ) {
-                            
+                        if (uploadCollection.getItems().length > 0) {
+
                             uploadCollection.upload();
                         };
 
@@ -465,7 +447,7 @@ sap.ui.define([
 
             //add slug parameter to previous parameters of the media object
             oEvent.getParameters().addHeaderParameter(oCustomerHeaderSlug);
-           
+
             // setTimeout(function () {
             //     MessageToast.show("Event beforeUploadStarts triggered");
             // }, 4000);

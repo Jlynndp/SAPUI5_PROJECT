@@ -21,7 +21,7 @@ sap.ui.define([
         };
 
         function navToCreateEmployee() {
-            //call Create Employee view            
+            //call Create Employee view    
             this.getOwnerComponent().getRouter().navTo("RouteCreateEmployee");
         };
 

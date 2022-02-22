@@ -4,9 +4,9 @@
     xmlns:u="sap.ui.unified"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m">
-    <NavContainer id="wizardNavContainer">
+    <NavContainer id="WizardNavContainer">
         <pages>
-            <Page id="wizardContentPage" showHeader="false">
+            <Page id="WizardContentPage" showHeader="false">
                 <content>
                     <Wizard id="CreateEmployeeWizard" class="sapUiResponsivePadding--header sapUiResponsivePadding--content" complete="onWizardCompleted" 
                             finishButtonText="{i18n>btnReview}" enableBranching="true" showNextButton="true">
@@ -15,7 +15,7 @@
                         <WizardStep id="EmployeeTypeStep" title="{i18n>employeeType}" validated="false" nextStep="EmployeeDataStep">
                             <MessageStrip class="sapUiSmallMarginBottom" text="{i18n>msgEmplType}" showIcon="true"/>
                             <HBox alignItems="Center" justifyContent="Center" width="100%">
-                                <SegmentedButton width="320px" selectionChange="setEmployeeType" selectedKey="{/Type}" selectedItem="">
+                                <SegmentedButton width="320px" selectionChange="setEmployeeType" selectedKey="{/Type}" selectedItem="{/Type}">
                                     <items>
                                         <SegmentedButtonItem text="{i18n>intern}" key="0"/>
                                         <SegmentedButtonItem text="{i18n>freelance}" key="1"/>

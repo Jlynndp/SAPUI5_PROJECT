@@ -4,7 +4,8 @@ sap.ui.define([
     'sap/ui/model/Filter',
     'sap/ui/model/FilterOperator',
     'sap/m/MessageBox',
-    "sap/m/MessageToast"
+    "sap/m/MessageToast",
+    "sap/ui/core/routing/History"
 ],
 
     /**
@@ -14,8 +15,9 @@ sap.ui.define([
      * @param {typeof sap.ui.model.FilterOperator} FilterOperator
      * @param {typeof sap.m.MessageBox} MessageBox
      * @param {typeof sap.m.MessageToast} MessageToast
+     * @param {typeof sap.ui.core.routing.History} History
      */
-    function (JSONModel, Controller, Filter, FilterOperator, MessageBox, MessageToast) {
+    function (JSONModel, Controller, Filter, FilterOperator, MessageBox, MessageToast, History) {
         "use strict";
 
 
@@ -34,9 +36,24 @@ sap.ui.define([
                 this._splitAppEmployee = this.byId("SplitAppEmployee");
             },
 
-            onBack: function() {
+            onBack: function () {
+                var oHistory = History.getInstance();
+                var sPreviousHash = oHistory.getPreviousHash();
 
+                this.byId("search_field").setValue("");
+                this.byId("employeeList").getBinding("items").filter("", "Application");
 
+                this._splitAppEmployee.to(this.createId("detailSelectEmpl"));
+
+                //validate if a previous view exists
+                if (sPreviousHash !== undefined) {
+                    //navigate to previous page
+                    window.history.go(-1);
+                } else {
+                    //navigate to Main route (from manifest.json)
+                    var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+                    oRouter.navTo("RouteMenu", true);
+                }
             },
 
 
@@ -209,7 +226,6 @@ sap.ui.define([
                 });
 
             },
-
 
             //add new Salary entity
             onPromoteEmployee: function (oEvent) {
