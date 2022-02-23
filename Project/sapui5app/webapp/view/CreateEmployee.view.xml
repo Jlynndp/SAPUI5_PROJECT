@@ -73,7 +73,7 @@
                                                   sameFilenameAllowed="false" 
                                                   instantUpload="false" 
                                                   numberOfAttachmentsText="{i18n>attachment}" 
-                                                  uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments" 
+                                                  uploadUrl="sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments" 
                                                   change="onFileChange" 
                                                   uploadComplete="onFileUploadComplete" 
                                                   beforeUploadStarts="onFileBeforeUpload" 
