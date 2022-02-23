@@ -3,11 +3,12 @@
     xmlns:f="sap.f"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:suite="sap.suite.ui.commons"
-    xmlns:custom="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
+    xmlns:custom="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+    class="sapUiSizeCompact">
 
-    <SplitApp id="SplitAppEmployee" initialMaster="master" initialDetail="detailSelectEmpl" backgroundColor="100">
+    <SplitApp id="SplitAppEmployee" initialMaster="master" initialDetail="detailSelectEmpl" backgroundColor="100" mode="PopoverMode">
         <masterPages  >
-            <Page id="master" backgroundDesign= "List" showHeader="false">
+            <Page id="master" backgroundDesign= "List" showHeader="false" visible="true">
                 <List id="employeeList" items="{employeeModel>/Users}">
                     <headerToolbar>
                         <Toolbar enabled="true" visible="true" width="" design="Solid" style="Standard">
@@ -19,22 +20,24 @@
                     </headerToolbar>
 
                     <items>
-                        <StandardListItem title="{employeeModel>FirstName} {employeeModel>LastName}" description="{employeeModel>Dni}" type="Active" press="onPressNavToDetail" custom:to="employeeDetail" />
+                        <StandardListItem title="{employeeModel>FirstName} {employeeModel>LastName}" description="{employeeModel>Dni}" type="Active" 
+                                          press="onPressNavToDetail" 
+                                          custom:to="employeeDetail" />
                     </items>
                 </List>
             </Page>
         </masterPages>
 
         <detailPages>
-            <Page id="detailSelectEmpl" titleLevel="Auto" showHeader="false" backgroundDesign="Transparent">
+            <Page id="detailSelectEmpl" titleLevel="Auto" showHeader="true" backgroundDesign="Transparent" visible="true" >
                 <VBox direction="Column" alignItems="Center" justifyContent="Center" fitContainer="true">
-                    <Text text="{i18n>msgSelectEmployee}" visible="true"/>
+                    <Text text="{i18n>msgSelectEmployee}"/>
                 </VBox>
                 <Panel >
                 </Panel>
             </Page>
 
-            <Page id="employeeDetail" showHeader="true" title="{i18n>titleEmployeeDetail}">
+            <Page id="employeeDetail" showHeader="true" title="{i18n>titleEmployeeDetail}" visible="true">
                 <ObjectHeader icon="{/_iconType}" iconAlt="{employeeModel>Dni}" responsive="true" title="{employeeModel>FirstName} {employeeModel>LastName}" intro="{employeeModel>Dni}" 
                               imageShape="Square" titleLevel="Auto" backgroundDesign="Solid">
                     <!-- <attributes> -->
