@@ -12,7 +12,8 @@ sap.ui.define([
         };
 
         function onAfterRendering() {
-            // Error en el framework: Al agregar la dirección URL de "Firmar pedidos", el componente GenericTile debería navegar directamente a dicha URL, // pero no funciona en la versión 1.78. Por tanto, una solución encontrada es eliminando la propiedad id del componente por jquery
+            // Error en el framework: Al agregar la dirección URL de "Firmar pedidos", el componente GenericTile debería navegar directamente a dicha URL, 
+            // pero no funciona en la versión 1.78. Por tanto, una solución encontrada es eliminando la propiedad id del componente por jquery
             var genericTileFirmarPedido = this.byId("GT_SignOrder");
             //Id del dom
             var idGenericTileFirmarPedido = genericTileFirmarPedido.getId();

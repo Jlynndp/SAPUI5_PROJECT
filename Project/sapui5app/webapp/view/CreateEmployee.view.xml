@@ -9,17 +9,18 @@
             <Page id="WizardContentPage" showHeader="false">
                 <content>
                     <Wizard id="CreateEmployeeWizard" class="sapUiResponsivePadding--header sapUiResponsivePadding--content" complete="onWizardCompleted" 
-                            finishButtonText="{i18n>btnReview}" enableBranching="true" showNextButton="true">
+                            finishButtonText="{i18n>btnReview}" showNextButton="true" currentStep="EmployeeTypeStep" >
 
                         <!--step 1: Employee Type selection-->
                         <WizardStep id="EmployeeTypeStep" title="{i18n>employeeType}" validated="false" nextStep="EmployeeDataStep">
                             <MessageStrip class="sapUiSmallMarginBottom" text="{i18n>msgEmplType}" showIcon="true"/>
                             <HBox alignItems="Center" justifyContent="Center" width="100%">
-                                <SegmentedButton width="320px" selectionChange="setEmployeeType" selectedKey="{/Type}" selectedItem="{/Type}">
+                                <SegmentedButton id="Btn_Type" width="320px" selectionChange="setEmployeeType" selectedItem="">
                                     <items>
-                                        <SegmentedButtonItem text="{i18n>intern}" key="0"/>
-                                        <SegmentedButtonItem text="{i18n>freelance}" key="1"/>
-                                        <SegmentedButtonItem text="{i18n>manager}" key="2"/>
+                                        <SegmentedButtonItem id="SB_Item1" text="{i18n>intern}" key="0" />
+                                        <SegmentedButtonItem id="SB_Item2" text="{i18n>freelance}" key="1"/>
+                                        <SegmentedButtonItem id="SB_Item3" text="{i18n>manager}" key="2"/>
+                                        <SegmentedButtonItem id="SB_Item4" text="" key="" visible="false"/>
                                     </items>
                                 </SegmentedButton>
                             </HBox>
@@ -27,7 +28,6 @@
 
                         <!--step 2: Employee Data Form-->
                         <WizardStep id="EmployeeDataStep" title="{i18n>employeeData}" validated="false" nextStep="AdditionalDataStep" activate="employeeDataValidation">
-                            <!-- validated="false" activate="additionalInfoValidation">-->
                             <MessageStrip class="sapUiSmallMarginBottom" text="{i18n>msgEmplData}" showIcon="true"/>
                             <form:SimpleForm editable="true">
 
@@ -42,10 +42,18 @@
 
                                 <Label text="{jsonModelConfig>/salaryLabel}"/>
                                 <Slider enableTickmarks="true" class="sapUiSmallMarginBottom" min="{jsonModelConfig>/salaryMin}" max="{jsonModelConfig>/salaryMax}" 
-                                        value="{/Salary}" width="auto" progress="true" step="{jsonModelConfig>/salaryStep}"/>
+                                        value="{/Salary}" width="99%" progress="true" step="{jsonModelConfig>/salaryStep}" />
 
                                 <Label text="{i18n>creationDate}" required="true"/>
-                                <DatePicker value="{/CreationDate}" valueState="{/_creationDateState}" change="onChangeCreationDate"/>
+                                <!-- <DatePicker value="{/CreationDate}" valueState="{/_creationDateState}" change="onChangeCreationDate"/> -->
+
+                                <DatePicker id="DP4" value="{path:'/CreationDate', 
+                                                             type:'sap.ui.model.type.Date', 
+                                                             formatOptions: { style: 'medium', strictParsing: true}}" 
+                                            class="sapUiSmallMarginBottom" required="true"
+                                            valueState="{/_creationDateState}"
+                                            change="onChangeCreationDate"/>
+
                             </form:SimpleForm>
                         </WizardStep>
 
@@ -110,12 +118,8 @@
 
                             <Label text="{i18n>creationDate}"/>
                             <Text text="{path: '/CreationDate',
-                                         type: 'sap.ui.model.type.Date',
-                                         formatOptions: {
-                                             source: { pattern: 'dd-MM-yyyy' },
-                                             style: 'medium'}}" />
-
-
+                                         type: 'sap.ui.model.odata.type.Date',
+                                         formatOptions: {style: 'medium'}}" />
                             <Link press="editStepTwo" text="Edit" />
                         </form:content>
                     </form:SimpleForm>

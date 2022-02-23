@@ -1,4 +1,4 @@
-<mvc:View controllerName="logaligroup.sapui5app.controller.ShowEmployee" displayBlock="true"
+<mvc:View xmlns:calendar="sap.ui.unified.calendar" controllerName="logaligroup.sapui5app.controller.ShowEmployee" displayBlock="true"
     xmlns="sap.m"
     xmlns:f="sap.f"
     xmlns:mvc="sap.ui.core.mvc"
@@ -26,7 +26,7 @@
         </masterPages>
 
         <detailPages>
-            <Page id="detailSelectEmpl" titleLevel="Auto" showHeader="false">
+            <Page id="detailSelectEmpl" titleLevel="Auto" showHeader="false" backgroundDesign="Transparent">
                 <VBox direction="Column" alignItems="Center" justifyContent="Center" fitContainer="true">
                     <Text text="{i18n>msgSelectEmployee}" visible="true"/>
                 </VBox>
@@ -34,18 +34,13 @@
                 </Panel>
             </Page>
 
-            <Page id="employeeDetail" showHeader="false">
-                <Panel backgroundDesign="Transparent" height="auto">
-                    <HBox direction="Row" justifyContent="Center">
-                        <Text text="{i18n>titleEmployeeDetail}" visible="true" />
-                    </HBox>
-                </Panel>
-
-                <ObjectHeader icon="{/_iconType}" iconAlt="{employeeModel>Dni}" responsive="true" title="{employeeModel>FirstName} {employeeModel>LastName}" intro="{employeeModel>Dni}" imageShape="Square" titleLevel="Auto" backgroundDesign="Transparent">
+            <Page id="employeeDetail" showHeader="true" title="{i18n>titleEmployeeDetail}">
+                <ObjectHeader icon="{/_iconType}" iconAlt="{employeeModel>Dni}" responsive="true" title="{employeeModel>FirstName} {employeeModel>LastName}" intro="{employeeModel>Dni}" 
+                              imageShape="Square" titleLevel="Auto" backgroundDesign="Solid">
                     <!-- <attributes> -->
                     <ObjectAttribute title="{i18n>creationDate}" text="{path:'employeeModel>CreationDate', 
                                                                         type:'sap.ui.model.odata.type.Date', 
-                                                                        formatOptions: { style: 'long'}
+                                                                        formatOptions: { style: 'medium'}
                                                                         }"/>
                     <ObjectAttribute title="{i18n>type}" text="{= ${employeeModel>Type}==='0' ? ${i18n>intern} : 
                                                                 ${employeeModel>Type}==='1' ? ${i18n>freelance} : 
@@ -54,20 +49,8 @@
                     <!-- </attributes> -->
                 </ObjectHeader>
 
-
-                <!-- <Panel backgroundDesign="Solid"> -->
-                <!-- <IconTabBar expandable="false" expanded="true" applyContentPadding="false" upperCase="false" visible="true" selectedKey="Ok" backgroundDesign="Transparent" headerBackgroundDesign="Transparent" class="sapUiResponsiveContentPadding">
-                                <items>
-                                    <IconTabFilter icon="sap-icon://attachment" text="{i18n>files}" design="Horizontal" showAll="false" textDirection="Inherit" enabled="true" visible="true">
-                                        <UploadCollection id="UploadCollection" maximumFilenameLength="55" maximumFileSize="10" multiple="true" sameFilenameAllowed="false" instantUpload="false" uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments" change="onFileChange" uploadComplete="onFileUploadComplete" beforeUploadStarts="onFileBeforeUpload" fileDeleted="onFileDeleted"/>
-                                    </IconTabFilter>
-                                    <IconTabFilter icon="sap-icon://money-bills" count="12">
-                                        <Text text="Notes go here ..." />
-                                    </IconTabFilter>
-                                </items>
-                            </IconTabBar> -->
-
-                <IconTabBar expandable="false" expanded="true" applyContentPadding="false" upperCase="false" visible="true" selectedKey="Ok" class="sapUiResponsiveContentPadding" backgroundDesign="Translucent" headerBackgroundDesign="Transparent">
+                <IconTabBar expandable="false" expanded="true" applyContentPadding="false" upperCase="false" visible="true" selectedKey="Ok" 
+                            class="sapUiResponsiveContentPadding" backgroundDesign="Solid" headerBackgroundDesign="Solid">
                     <items >
                         <IconTabFilter icon="sap-icon://attachment" text="{i18n>files}" design="Horizontal" showAll="false" textDirection="Inherit" enabled="true" visible="true">
                             <!-- <content backgroundDesign="Solid"> -->
@@ -79,7 +62,7 @@
                                               multiple="true" 
                                               sameFilenameAllowed="false" 
                                               instantUpload="true" 
-                                              uploadUrl="/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments"
+                                              uploadUrl="sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments"
                                               items="{employeeModel>UserToAttachment}" 
                                               change="onFileChange" 
                                               uploadComplete="onFileUploadComplete" 

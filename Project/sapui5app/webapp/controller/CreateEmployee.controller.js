@@ -18,9 +18,6 @@ sap.ui.define([
             this._oNavContainer = this.byId("WizardNavContainer");
             this._oWizardContentPage = this.byId("WizardContentPage");
 
-            this._model = new sap.ui.model.json.JSONModel([]);
-            this.getView().setModel(this._model);
-
             //config data view properties
             var oJSONModelConfig = new sap.ui.model.json.JSONModel({
                 dniLabel: "",
@@ -32,56 +29,42 @@ sap.ui.define([
             });
             this.getView().setModel(oJSONModelConfig, "jsonModelConfig");
 
-            this.getOwnerComponent().getRouter().getRoute("RouteCreateEmployee").attachPatternMatched(this.resetWizard, this);
+            this.getOwnerComponent().getRouter().getRoute("RouteCreateEmployee").attachPatternMatched(this.resetView, this);
         },
 
-        resetWizard: function (oEvent) {
+        resetView: function (oEvent) {
             var oParameters = oEvent.getParameters();
             if (oParameters.name == "RouteCreateEmployee") {
-                // if route matched do your actions
 
-                // this._wizard = this.byId("CreateEmployeeWizard");
-                // this._oNavContainer = this.byId("WizardNavContainer");
-                // this._oWizardContentPage = this.byId("WizardContentPage");
-                //this._model.setData(null);
-
-                //this.getView().getModel("jsonModelConfig").setData(null);
-
-                this._model.setProperty("/Type", "");
-                this._model.setProperty("/Salary", "");
+                //reset model
+                if (this._model) {
+                    this._model.destroy();
+                }
+                this._model = new sap.ui.model.json.JSONModel([]);
                 this.getView().setModel(this._model);
 
+                //reset files
+                this.byId("UploadCollection").removeAllItems();
+
+                //reset segmented button selection
+                this.byId("Btn_Type").setSelectedButton(this.byId("SB_Item4").oButton.getId());
+                this.byId("Btn_Type").setSelectedItem(this.byId("SB_Item4").getId());
+                this.byId("Btn_Type").setSelectedKey("");
+
+                //reset wizard
                 var oFirstStep = this._wizard.getSteps()[0];
                 this.discardProgress(oFirstStep);
                 this._wizard.goToStep(oFirstStep);
                 oFirstStep.setValidated(false);
-
-                this._model.removeAllContent();
-
-                // this._handleNavigationToStep(0);
-                // this._wizard.invalidateStep(this.byId("EmployeeTypeStep"));
-
-                //this._model = new sap.ui.model.json.JSONModel([]);
-                //this.getView().setModel(this._model);
-
-                // //config data view properties
-                // var oJSONModelConfig = new sap.ui.model.json.JSONModel({
-                //     dniLabel: "",
-                //     salaryLabel: "",
-                //     salaryMin: 0,
-                //     salaryMax: 0,
-                //     salaryValue: 0,
-                //     salaryStep: 0,
-                // });
-                // this.getView().setModel(oJSONModelConfig, "jsonModelConfig");
-
-                //reset wizard steps
+                this._oNavContainer.to(this.byId("WizardContentPage"));
             }
 
         },
 
         setEmployeeType: function (oEvent) {
             var employeeType = oEvent.getParameters().item.getKey();
+            this._model.setProperty("/Type", employeeType);
+
             var currentStep = this.byId("EmployeeTypeStep");
 
             // get view models
@@ -123,7 +106,7 @@ sap.ui.define([
                 case "2":
                     salaryMin = 50000;
                     salaryMax = 200000;
-                    salaryStep = 20000;
+                    salaryStep = 12000;
                     salary = 70000;
                     break;
             }
@@ -141,35 +124,6 @@ sap.ui.define([
 
 
         employeeDataValidation: function () {
-            // var firstName = this._model.getData()._firstNameState;
-            // var lastName =  this._model.getData().LastName;
-            // var dni =  this._model.getData().Dni;
-            // var creationDate = this.byId("i_CreationDate").getValue();
-
-            // if (!firstName) {
-            //     this._model.setProperty("/_firstNameState", "Error");
-            // } else {
-            //     this._model.setProperty("/_firstNameState", "None");
-            // }
-
-            // if (!lastName) {
-            //     this._model.setProperty("/_lastNameState", "Error");
-            // } else {
-            //     this._model.setProperty("/_lastNameState", "None");
-            // }
-
-            // if (!dni) {
-            //     this._model.setProperty("/_dniState", "Error");
-            // } else {
-            //     this.onChangeDni(dni);
-            // }
-
-            // //if (!creationDate) {
-            // //     this.model.setProperty("/creationDateState", "Error");
-            // // } else {
-            // //     this.onChangeCreationDate(creationDate);
-            // // }
-
             if (this._model.getProperty("/_firstNameState") === "None" &&
                 this._model.getProperty("/_lastNameState") === "None" &&
                 this._model.getProperty("/_dniState") === "None" &&
@@ -249,14 +203,6 @@ sap.ui.define([
             this.employeeDataValidation();
         },
 
-        // //go to Data Employee step
-        // goToDataStep: function () {
-        //     if (this._wizard.getProgressStep() === this.byId("EmployeeTypeStep")) {
-        //         this._wizard.nextStep();
-        //     }
-        // },
-
-
         onWizardCompleted: function () {
             //get files
             var files = this.byId("UploadCollection").getItems();
@@ -299,10 +245,6 @@ sap.ui.define([
             this._handleNavigationToStep(2);
         },
 
-        // editStepFour: function () {
-        // 	this._handleNavigationToStep(3);
-        // },
-
         _handleNavigationToStep: function (iStepNumber) {
             var fnAfterNavigate = function () {
                 this._wizard.goToStep(this._wizard.getSteps()[iStepNumber]);
@@ -313,25 +255,21 @@ sap.ui.define([
             this.backToWizardContent();
         },
 
-        _handleMessageBoxOpen: function (sMessage, sMessageBoxType) {
-            MessageBox[sMessageBoxType](sMessage, {
-                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
-                onClose: function (oAction) {
-                    if (oAction === MessageBox.Action.YES) {
-                        this._handleNavigationToStep(0);
-                        this._wizard.invalidateStep(this.byId("EmployeeTypeStep"));
-                        this._wizard.discardProgress(this._wizard.getSteps()[0]);
-                    }
-                }.bind(this)
-            });
-        },
-
-        // _setEmptyValue: function (sPath) {
-        // 	this.model.setProperty(sPath, "n/a");
+        // _handleMessageBoxOpen: function (sMessage, sMessageBoxType) {
+        //     MessageBox[sMessageBoxType](sMessage, {
+        //         actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+        //         onClose: function (oAction) {
+        //             if (oAction === MessageBox.Action.YES) {
+        //                 this._handleNavigationToStep(0);
+        //                 this._wizard.invalidateStep(this.byId("EmployeeTypeStep"));
+        //                 this._wizard.discardProgress(this._wizard.getSteps()[0]);
+        //                 // this.backToMenu();
+        //             }
+        //         }.bind(this)
+        //     });
         // },
 
         onWizardCancel: function (oEvent) {
-            //var employeeModel = this.getView().getModel(); //oEvent.getSource().getModel();
             var oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
 
             MessageBox.confirm(oResourceBundle.getText("msgCancelWizard"), {
@@ -339,14 +277,8 @@ sap.ui.define([
                 emphasizedAction: sap.m.MessageBox.Action.OK,
                 onClose: function (sAction) {
                     if (sAction === MessageBox.Action.OK) {
-                        //reset model
-                        //employeeModel.setData(null);
-                        //this.discardProgress(this._wizard.getSteps()[0]);
-
                         //back to Menu
-                        var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
-                        oRouter.navTo("RouteMenu", true);
-
+                        this.backToMenu();
                     }
                 }.bind(this)
             });
@@ -354,67 +286,76 @@ sap.ui.define([
 
         onWizardSubmit: function (oEvent) {
             var oResourceBundle = this.getView().getModel("i18n").getResourceBundle();
+            var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 
-            this._handleMessageBoxOpen(oResourceBundle.getText("msgCreateEmpl"), "confirm");
-
-            //submit Employee: “/sap/opu/odata/sap/ZEMPLOYEES_SRV/Users”
-
-
-            //get ID for selected employee: model/object/property
-            var employeeId = this.getView().getModel().getData().EmployeeId;
-
-            //get employee
+            //get employee data
             var employeeModel = this.getView().getModel().getData();
+            var employeeId = employeeModel.EmployeeId;
 
             var date = new Date(employeeModel.CreationDate);
             var creationDate = date.toJSON().slice(0, 19);
 
-            if (typeof employeeId == 'undefined') {
-                //build create operation body
-                var body = {
-                    SapId: this.getOwnerComponent().SapId,
-                    Type: employeeModel.Type,
-                    FirstName: employeeModel.FirstName,
-                    LastName: employeeModel.LastName,
-                    Dni: employeeModel.Dni,
-                    CreationDate: creationDate,
-                    Comments: employeeModel.Comments,
-                    UserToSalary: [{
-                        Amount: parseFloat(employeeModel.Salary).toString(),
-                        Comments: employeeModel.Comments,
-                        Waers: "EUR"
-                    }]
-                };
+            MessageBox.confirm(oResourceBundle.getText("msgSubmitWizard"), {
+                actions: [MessageBox.Action.YES, MessageBox.Action.NO],
+                onClose: function (oAction) {
+                    if (oAction === MessageBox.Action.YES) {
 
-                //save new employee: get view/model/create_operation
-                this.getView().getModel("employeeModel").create("/Users", body, {
-                    success: function (data) {
-                        //this.onReadDataEmployee.bind(this)(employeeId);
-                        //sap.m.MessageToast.show(oResourceBundle.getText("oDataSaveOK"));
-                        employeeId = data.EmployeeId;
-                        this._model.setProperty("/EmployeeId", data.EmployeeId);
+                        if (typeof employeeId == 'undefined') {
+                            //build create operation body
+                            var body = {
+                                SapId: this.getOwnerComponent().SapId,
+                                Type: employeeModel.Type,
+                                FirstName: employeeModel.FirstName,
+                                LastName: employeeModel.LastName,
+                                Dni: employeeModel.Dni,
+                                CreationDate: creationDate,
+                                Comments: employeeModel.Comments,
+                                UserToSalary: [{
+                                    Amount: parseFloat(employeeModel.Salary).toString(),
+                                    Comments: employeeModel.Comments,
+                                    Waers: "EUR"
+                                }]
+                            };
 
-                        // //header parameter: x-csrf-token
-                        // this.onFileChange(oEvent);
-                        // //slug parameter: SapId; EmployeeId; FileName
-                        // this.onFileBeforeUpload(oEvent);
-                        let uploadCollection = this.byId("UploadCollection");
-                        if (uploadCollection.getItems().length > 0) {
+                            //submit Employee: “/sap/opu/odata/sap/ZEMPLOYEES_SRV/Users”
+                            this.getView().getModel("employeeModel").create("/Users", body, {
+                                success: function (data) {
+                                    employeeId = data.EmployeeId;
+                                    this._model.setProperty("/EmployeeId", data.EmployeeId);
 
-                            uploadCollection.upload();
+                                    //upload attachments: “/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments”
+                                    let uploadCollection = this.byId("UploadCollection");
+                                    if (uploadCollection.getItems().length > 0) {
+
+                                        uploadCollection.upload();
+                                    };
+
+                                    sap.m.MessageBox.success(oResourceBundle.getText("msgCreateOK", employeeId), {
+                                        actions: [MessageBox.Action.OK],
+                                        onClose: function(oAction) {
+                                            oRouter.navTo("RouteMenu", true);
+                                        }
+                                    });
+                                }.bind(this),
+                                error: function (e) {
+                                    sap.m.MessageToast.show(oResourceBundle.getText("msgCreateKO"));
+                                }.bind(this)
+                            });
                         };
 
-                        //upload attachments: “/sap/opu/odata/sap/ZEMPLOYEES_SRV/Attachments”
-                        //sap.m.MessageBox.success(oResourceBundle.getText("oDataSaveOK"));
+                    }
+                }.bind(this)
+            });
 
-
-                    }.bind(this),
-                    error: function (e) {
-                        sap.m.MessageToast.show(oResourceBundle.getText("oDataSaveKO"));
-                    }.bind(this)
-                });
-            };
         },
+
+
+        //back to Menu
+        backToMenu: function () {
+            var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+            oRouter.navTo("RouteMenu", true);
+        },
+
 
         discardProgress: function () {
             this._wizard.discardProgress(this.byId("EmployeeTypeStep"));
@@ -434,8 +375,7 @@ sap.ui.define([
         },
 
 
-        //UPLOAD FILE FUNCTIONS
-        //upload file executes Post method with slug and csrf-token parameters
+        //FILE UPLOAD FUNCTIONS
         onFileBeforeUpload: function (oEvent) {
             var fileName = oEvent.getParameter("fileName");
 
@@ -447,10 +387,6 @@ sap.ui.define([
 
             //add slug parameter to previous parameters of the media object
             oEvent.getParameters().addHeaderParameter(oCustomerHeaderSlug);
-
-            // setTimeout(function () {
-            //     MessageToast.show("Event beforeUploadStarts triggered");
-            // }, 4000);
         },
 
         //update token every time files change
@@ -467,27 +403,6 @@ sap.ui.define([
 
         //update collection after a new file has been uploaded
         onFileUploadComplete: function (oEvent) {
-            //oEvent.getSource().getBinding("items").refresh();
-            // var oUploadCollection = oEvent.getSource();
-            //oUploadCollection.setUploadUrl(null);
-
-            MessageToast.show("Event uploadComplete triggered");
-
-            // var sUploadedFileName = oEvent.getParameter("files")[0].fileName;
-            // setTimeout(function () {
-            //     var oUploadCollection = this.byId("UploadCollection");
-
-            //     for (var i = 0; i < oUploadCollection.getItems().length; i++) {
-            //         if (oUploadCollection.getItems()[i].getFileName() === sUploadedFileName) {
-            //             oUploadCollection.removeItem(oUploadCollection.getItems()[i]);
-            //             break;
-            //         }
-            //     }
-
-            //     // delay the success message in order to see other messages before
-            //     MessageToast.show("Event uploadComplete triggered");
-            // }.bind(this), 8000);
-
         },
 
         //delete files in sap-system
@@ -504,49 +419,6 @@ sap.ui.define([
                 }
             });
         }
-
-        // //call file with /$value, using window methods
-        // downloadFile: function (oEvent) {
-        //     const sPath = oEvent.getSource().getBindingContext("incidenceModel").getPath();
-        //     window.open("/sap/opu/odata/sap/YSAPUI5_SRV_01" + sPath + "/$value");
-        // }
-
-
-        //     onReadDataEmployee: function (employeeID) {
-        //         //get view/model/read_operation
-        //         this.getView().getModel("employeeModel").read("/Users", {
-        //             filters: [
-        //                 new sap.ui.model.Filter("SapId", "EQ", this.getOwnerComponent().SapId),
-        //                 new sap.ui.model.Filter("EmployeeId", "EQ", employeeID.toString())
-        //             ],
-        //             success: function (data) {
-        //                 //get incidence model
-        //                 var employeeModel = this._detailEmployeeView.getModel("employeeModel");
-        //                 employeeModel.setData(data.results);
-
-        //                 // //get table incidence from current view
-        //                 // var tableIncidence = this._detailEmployeeView.byId("tableIncidence");
-        //                 // tableIncidence.removeAllContent();
-
-        //                 // //add incidences to incidence model
-        //                 // for (var incidence in data.results) {
-
-        //                 //     data.results[incidence]._ValidDate = true;
-        //                 //     data.results[incidence].EnabledSave = false;
-
-        //                 //     var newIncidence = sap.ui.xmlfragment("logaligroup.Employees.fragment.NewIncidence", this._detailEmployeeView.getController());
-        //                 //     this._detailEmployeeView.addDependent(newIncidence);
-        //                 //     newIncidence.bindElement("incidenceModel>/" + incidence);
-        //                 //     tableIncidence.addContent(newIncidence);
-        //                 // }
-
-        //             }.bind(this),
-
-        //             error: function (e) {
-        //             }.bind(this)
-        //         });
-
-
-
+     
     });
 });
